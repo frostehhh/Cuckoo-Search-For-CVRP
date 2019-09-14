@@ -55,10 +55,10 @@ def parse_file(filepath):
             if key == 'name':
                 name = match.group('name')
             elif key == 'comment':
-                minNumVehicles = match.group('minNumVehicles')
-                optimalValue = match.group('optimalValue')
+                minNumVehicles = int(match.group('minNumVehicles'))
+                optimalValue = int(match.group('optimalValue'))
             elif key == 'capacity':
-                capacity = match.group('capacity')
+                capacity = int(match.group('capacity'))
                 InstanceData = {
                     'Name': name,
                     'MinNumVehicles': minNumVehicles,
