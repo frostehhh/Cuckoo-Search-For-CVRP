@@ -219,5 +219,12 @@ class CVRPInfo():
             while n2 == n1: 
                 n2 = random.randrange(0,numRoutes)
 
-            sol.routes[n1]
-            
+            # Randomly select nodes to swap from each route
+            r1 = random.randrange(0, len(sol.routes[n1]))
+            r2 = random.randrange(0, len(sol.routes[n2]))
+
+            # Perform Swap
+            _ = sol.routes[n1][r1]
+            sol.routes[n1][r1] = sol.routes[n1][r2]
+            sol.routes[n1][r2] = _
+            return sol
