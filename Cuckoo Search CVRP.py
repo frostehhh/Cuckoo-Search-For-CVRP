@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import regex as re
+import Parser as p
 
 #region Initialize Parameters
 #Initialize Cuckoo SearchParameters
@@ -11,7 +12,6 @@ maxGenerations = 5000 # maximum number of iterations
 stopCriteration = maxGenerations / 5 # attempt limit of successive iterations
 
 #Initialize CVRP Parameters
-
 
 Tol = 1.0e-5 # Tolerance
 
@@ -27,12 +27,16 @@ DataSetB = os.listdir(DataSetBPath) # list of file names of benchmark instances 
 DataSetP = os.listdir(DataSetPPath) # list of file names of benchmark instances from Set P
 #end region
 
+#region Main
 #load all datasets from Set A
 for dataset in DataSetA:
-    with open(DataSetAPath + dataset) as file:
-        file_contents = file.read()
-        print(file_contents) # for testing, remove later. 
-        
-        # Capacity = 
-        # Node_Coordinates = []
-        # Node_Demand = []
+        listCoord, listDemand, InstanceData = p.parse_file(DataSetAPath + dataset)
+        print(listCoord)
+        print(listDemand)
+        print(InstanceData)
+
+# Capacity = 
+# Node_Coordinates = []
+# Node_Demand = []
+
+#endregion
