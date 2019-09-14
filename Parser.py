@@ -59,25 +59,25 @@ def parse_file(filepath):
                 optimalValue = match.group('optimalValue')
             elif key == 'capacity':
                 capacity = match.group('capacity')
-                row = {
+                InstanceData = {
                     'Name': name,
                     'MinNumVehicles': minNumVehicles,
                     'OptimalValue' : optimalValue,
                     'Capacity' : capacity
                 }
-                InstanceData.append(row) 
+                
             elif key == 'node_coord':
                 IsNodeCoord = True
             elif key == 'demand_values':
                 IsNodeCoord = False
                 IsDemandValue = True
             elif IsNodeCoord and key == 'values':
-                x = match.group('x')
-                y = match.group('y')
+                x = int(match.group('x'))
+                y = int(match.group('y'))
                 coord = [x,y]
                 listCoords.append(coord)
             elif IsDemandValue and key == 'values':
-                demand = match.group('x')
+                demand = int(match.group('x'))
                 listDemand.append(demand)
             line = file_object.readline()
 
