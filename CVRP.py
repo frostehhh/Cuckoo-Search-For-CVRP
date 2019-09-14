@@ -45,7 +45,6 @@ class CVRPInfo():
 
         def __repr__(self):
             return "\n".join([str(route) for route in self.routes])
-
     class Route:
         def __init__(self, route=[], cost=0, is_valid=False, demand=0):
             self.is_valid = is_valid
@@ -70,19 +69,15 @@ class CVRPInfo():
             debug_str = ", cost = " + str(self.cost) + ", demand = " + str(self.listDemand)
             ret_str = "->".join(str(n) for n in self.route)
             return ret_str + (debug_str if False else "")
-    
-    class CuckooSearch:
-        pass
 
-    def __init__(self, data_file, debug=False):
+    def __init__(self, data_file):
         self.read_data(data_file)
-        self.compute_dists()
+        self.__compute_dists()
         self.start_node = 1
-        self.debug = debug
-        self.max_route_len = 10
+        # self.debug = debug
+        # self.max_route_len = 10 # I don't need a max route limiter
         random.seed()
 
-    #the vrp file is such an awful format
     def read_data(self, path):
         self.listCoord, self.listDemand, self.instanceData = p.parse_file(path)
         self.fileName = self.instanceData['Name']
@@ -91,26 +86,19 @@ class CVRPInfo():
         self.capacity = self.instanceData['Capacity']
         self.dimension = len(self.listCoord)
 
-    def compute_dist(self, n1, n2):
+    def __compute_dist(self, n1, n2):
         n1 = self.listCoord[n1]
         n2 = self.listCoord[n2]
         return math.sqrt((n1[0] - n2[0])**2 + (n1[1] - n2[1])**2)
 
-    def compute_dists(self):
+    def __compute_dists(self):
         self.dist = [list([-1 for _ in range(self.dimension)]) \
                         for _ in range(self.dimension)]
         for xi in range(self.dimension):
             for yi in range(self.dimension):
-                self.dist[xi][yi] = self.compute_dist(xi, yi)
+                self.dist[xi][yi] = self.__compute_dist(xi, yi)
 
-    def bounding_box(self, route):
-        x_min = min(self.listCoord[node][0] for node in route)
-        x_max = max(self.listCoord[node][0] for node in route)
-        y_min = min(self.listCoord[node][1] for node in route)
-        y_max = max(self.listCoord[node][1] for node in route)
-        return x_min, x_max, y_min, y_max
-
-    def make_solution(self, routes):
+    def create_solution(self, routes):
         cost = 0
         demand = 0
         is_valid = True
@@ -130,7 +118,7 @@ class CVRPInfo():
         return sol
 
 
-    def make_route(self, node_list):
+    def create_route(self, node_list):
         if node_list[0] != self.start_node:
             return None
         cost = 0
@@ -146,7 +134,7 @@ class CVRPInfo():
         route = self.Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
 
-    def make_random_solution(self, greedy=False):
+    def create_random_solution(self, greedy=False):
         unserviced = [i for i in range(2, self.dimension)]
         #print(unserviced)
         random.shuffle(unserviced)
@@ -161,7 +149,7 @@ class CVRPInfo():
                 i = min([i for i in range(len(unserviced))], \
                         key=lambda x: self.dist[cur_route[-1] if random.uniform(0, 1) < 0.9 else 1][unserviced[x]])
             node = unserviced[i]
-            if route_length <= self.max_route_len and route_demand + self.listDemand[node] <= self.capacity:
+            if route_demand + self.listDemand[node] <= self.capacity:
                 cur_route += [node]
                 route_length += 1
                 route_demand += self.listDemand[node]
@@ -169,13 +157,13 @@ class CVRPInfo():
                 del unserviced[i]
                 continue
             cur_route += [1]
-            routes += [self.make_route(cur_route)]
+            routes += [self.create_route(cur_route)]
             cur_route = [1]
             route_demand = 0
             route_length = 0
-        routes += [self.make_route(cur_route + [1])]
+        routes += [self.create_route(cur_route + [1])]
         junk = ""
-        return self.make_solution(routes)
+        return self.create_solution(routes)
 
     def refresh(self, solution):
         solution.cost, solution.demand = 0, 0
@@ -219,16 +207,16 @@ class CVRPInfo():
         new_routes = []
         for route in solution.routes:
             route = self.steep_improve_route(route.route)
-            new_routes += [self.make_route(route)]
-        return self.make_solution(new_routes)
+            new_routes += [self.create_route(route)]
+        return self.create_solution(new_routes)
 
     def __repr__(self):
-        strin = {
-            "coords" : self.listCoord,
-            "demand" : self.listDemand,
+        string = {
+            "listCoord" : self.listCoord,
+            "listDemand" : self.listDemand,
             #"dists"  : self.dist
         }
-        return str(strin)
+        return str(string)
 
     def visualise(self, solution):
 
