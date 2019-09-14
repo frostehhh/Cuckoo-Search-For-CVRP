@@ -1,5 +1,4 @@
 import regex as re
-import pandas as pd
 
 rx_dict = {
     'name': re.compile(r'NAME : (?P<name>.*)'),
@@ -37,12 +36,8 @@ def parse_file(filepath):
     listCoords : [x,y] - contains list of coordinates of each node
     listDemand : x - contains list of demand of each node
     InstanceData : ['Name', 'MinNumVehicles', 'OptimalValue', 'Capacity']
-    # dfNodes : pd.DataFrame - contains coords and demand of each node
-    # dfInstanceDetails : pd.DataFrame - contains name, minNumVehicles, capacity
-    #     Parsed data
     """
 
-    NodeData = []
     InstanceData = []
 
     listCoords = []  # create an empty list to collect node coordinates
@@ -73,23 +68,9 @@ def parse_file(filepath):
                 InstanceData.append(row) 
             elif key == 'node_coord':
                 IsNodeCoord = True
-                # line = file_object.readline() # move to next line
-                # while line.strip():
-                #     if key == 'values':
-                #         x = match.group('x')
-                #         y = match.group('y')
-                #         coord = [x,y]
-                #         listCoords.append(coord)
-                #         line = file_object.readline()
             elif key == 'demand_values':
                 IsNodeCoord = False
                 IsDemandValue = True
-                # while line.strip():
-                #     line = file_object.readline()
-                #     if key == 'values':
-                #         demand = match.group('x')
-                #         listDemand.append(demand)
-                #         line = file_object.readline() #move to next line
             elif IsNodeCoord and key == 'values':
                 x = match.group('x')
                 y = match.group('y')
@@ -100,20 +81,4 @@ def parse_file(filepath):
                 listDemand.append(demand)
             line = file_object.readline()
 
-        
-        #add a node per row to NodeData
-        for i in range(len(listCoords)):
-            row = {
-                'Node_Coordinates': listCoords[i],
-                'Node_Demand': listDemand[i]
-            }
-            NodeData.append(row)
-
-        # # create a pandas DataFrame from the list of dicts
-        # dfNodes = pd.DataFrame(NodeData)
-        # dfInstanceDetails = pd.DataFrame(InstanceData)
-        # # set the School, Grade, and Student number as the index
-        # dfNodes.set_index(['Node_Coordinates','Node_Demand'],inplace=True)
-        # dfInstanceDetails.set_index(['Name', 'MinNumVehicles', 'OptimalValue', 'Capacity'], inplace=True)
     return listCoords, listDemand, InstanceData
-    # return dfNodes, dfInstanceDetails
