@@ -200,3 +200,24 @@ class CVRPInfo():
             norm = lambda x, y: (2*x + 250, 2*y + 250)
             draw.line([norm(*self.listCoord[n]) for n in nodes], fill=(r_c, g_c, b_c), width=2)
         return im
+
+    class neighborhood:
+        def twoOptInter(self, sol): 
+            # takes solution as input
+            # gets 2 routes randomly
+            # Select random node from each
+            # Swap nodes
+            numRoutes = len(sol.routes) # sol.routes - list
+
+            n1 = 0
+            n2 = 0
+
+            n1 = random.randrange(0,numRoutes)
+            n2 = random.randrange(0,numRoutes)
+
+            # Check if n2 == n1. If true, generate new value for n2.
+            while n2 == n1: 
+                n2 = random.randrange(0,numRoutes)
+
+            sol.routes[n1]
+            
