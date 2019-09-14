@@ -1,5 +1,6 @@
 from CVRP import CVRPInfo as CVRP
 from CVRP.CVRPInfo.neighborhood import twoOptInter
+from CVRP.CVRPInfo.neighborhood import doubleBridgeInter
 import operator as o
 import math
 import random
@@ -70,7 +71,7 @@ class CuckooSearch:
             nest = twoOptInter(nest)
 
         for i in range(doubleBridgeIter):
-            pass
+            nest = doubleBridgeInter(nest)
 
     def __repr__(self):
         pass
