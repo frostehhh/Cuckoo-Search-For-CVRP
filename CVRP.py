@@ -50,7 +50,7 @@ class CVRPInfo():
             self.is_valid = is_valid
             self.route = route
             self.cost = cost
-            self.listDemand = demand
+            self.demand = demand
 
         def insert_route(self, index, route):
             self.is_valid = False
@@ -66,7 +66,7 @@ class CVRPInfo():
             del self.route[self.route.index(x)]
 
         def __repr__(self):
-            debug_str = ", cost = " + str(self.cost) + ", demand = " + str(self.listDemand)
+            debug_str = ", cost = " + str(self.cost) + ", demand = " + str(self.demand)
             ret_str = "->".join(str(n) for n in self.route)
             return ret_str + (debug_str if False else "")
 
@@ -110,7 +110,7 @@ class CVRPInfo():
                 visited.add(x)
             cost += route.cost
             demand += route.demand
-        if len(visited) != self.dimension:
+        if len(visited) != self.dimension - 1: # I ADDED THIS, remove depot node from visited.
             print("NOT ALL VISITED")
             print(visited)
         sol = self.Solution(cost=cost, demand=demand, is_valid=is_valid, routes=routes)
@@ -134,6 +134,7 @@ class CVRPInfo():
         route = self.Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
 
+    
     def create_random_solution(self, greedy=False):
         unserviced = [i for i in range(2, self.dimension)]
         #print(unserviced)
@@ -162,7 +163,6 @@ class CVRPInfo():
             route_demand = 0
             route_length = 0
         routes += [self.create_route(cur_route + [1])]
-        junk = ""
         return self.create_solution(routes)
 
     def refresh(self, solution):
@@ -178,37 +178,6 @@ class CVRPInfo():
             if route_obj.demand > self.capacity:
                 route_obj.is_valid = False
                 solution.is_valid = False
-
-    def steep_improve_route(self, route):
-        savings = 1
-        iters = 0
-        while savings > 0:
-            savings = 0
-            if iters > 1000:
-                return route
-            for t1_i in range(len(route) - 2):
-                for t4_i in range(len(route) - 2):
-                    if t4_i != t1_i and t4_i != t1_i + 1 and t4_i + 1 != t1_i:
-                        t1 = route[t1_i]
-                        t2 = route[t1_i + 1]
-                        t3 = route[t4_i + 1]
-                        t4 = route[t4_i]
-                        diff = self.dist[t1][t2] + self.dist[t4][t3] - self.dist[t2][t3] - self.dist[t1][t4]
-                        if diff > savings:
-                            savings = diff
-                            t1best = t1_i
-                            t4best = t4_i
-            if savings > 0:
-                route[t1best+1], route[t4best] = route[t4best], route[t1best+1]
-            iters += 1
-        return route
-
-    def steep_improve_solution(self, solution):
-        new_routes = []
-        for route in solution.routes:
-            route = self.steep_improve_route(route.route)
-            new_routes += [self.create_route(route)]
-        return self.create_solution(new_routes)
 
     def __repr__(self):
         string = {
