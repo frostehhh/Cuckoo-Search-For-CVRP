@@ -1,6 +1,4 @@
 from CVRP import CVRPInfo as CVRP
-from CVRP.CVRPInfo.neighborhood import twoOptInter
-from CVRP.CVRPInfo.neighborhood import doubleBridgeInter
 import operator as o
 import math
 import random
@@ -68,10 +66,63 @@ class CuckooSearch:
             doubleBridgeIter = 1
         
         for i in range(twoOptIter):
-            nest = twoOptInter(nest)
+            nest = self.__twoOptInter(nest)
 
         for i in range(doubleBridgeIter):
-            nest = doubleBridgeInter(nest)
+            nest = self.__doubleBridgeInter(nest)
+
+    def __twoOptInter(self, sol): 
+        # takes solution as input
+        # gets 2 routes randomly
+        # Select random node from each
+        # Swap nodes
+        numRoutes = len(sol.routes) # sol.routes - list
+
+        # Randomly select 2 routes to swap
+        r1 = random.randrange(0,numRoutes)
+        r2 = random.randrange(0,numRoutes)
+
+        # Check if n2 == n1. If true, generate new value for n2.
+        while r2 == r1: 
+            r2 = random.randrange(0,numRoutes)
+        # sol.routes[0].route[0]        # Randomly select nodes to swap from each route
+        n1 = random.randrange(0, len(sol.routes[r1].route))
+        n2 = random.randrange(0, len(sol.routes[r2].route))
+
+        # Perform Swap
+        _ = sol.routes[r1].route[n1]
+        sol.routes[r1].route[n1] = sol.routes[r2].route[n2]
+        sol.routes[r2].route[n2] = _
+            
+        return sol
+
+    def __doubleBridgeInter(self, sol):
+        # takes solution as input
+        # gets 4 routes randomly
+        # Select random node from each
+        # Swap nodes
+        numRoutes = len(sol.routes) # sol.routes - list
+
+        # Randomly select 2 routes to swap
+        r = list(range(numRoutes))
+        random.shuffle(r)
+        r1, r2, r3, r4 = r[0], r[1], r[2], r[3]
+        
+        # Randomly select nodes to swap from each route
+        n1 = random.randrange(0, len(sol.routes[r1].route))
+        n2 = random.randrange(0, len(sol.routes[r2].route))
+        n3 = random.randrange(0, len(sol.routes[r3].route))
+        n4 = random.randrange(0, len(sol.routes[r4].route))
+
+        # Perform Swap - r1 & r3, r2 & r4
+        _ = sol.routes[r1].route[n1]
+        sol.routes[r1].route[n1] = sol.routes[r3].route[n3]
+        sol.routes[r3].route[n3] = _
+        _ = sol.routes[r2].route[n2]
+        sol.routes[r2].route[n2] = sol.routes[r4].route[n4]
+        sol.routes[r4].route[n4] = _
+
+        return sol
 
     def __repr__(self):
         pass
@@ -82,3 +133,4 @@ class CuckooSearch:
         #     #"dists"  : self.dist
         # }
         # return str(string)
+    

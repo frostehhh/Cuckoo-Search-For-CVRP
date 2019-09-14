@@ -70,10 +70,12 @@ class CVRPInfo():
             ret_str = "->".join(str(n) for n in self.route)
             return ret_str + (debug_str if False else "")
 
-    def __init__(self, data_file):
+    def __init__(self, data_file, CVRPInstance = None):
         self.read_data(data_file)
         self.__compute_dists()
         self.start_node = 1
+        if CVRPInstance is not None:
+            self = CVRPInstance
         # self.debug = debug
         # self.max_route_len = 10 # I don't need a max route limiter
         random.seed()
@@ -201,57 +203,5 @@ class CVRPInfo():
             draw.line([norm(*self.listCoord[n]) for n in nodes], fill=(r_c, g_c, b_c), width=2)
         return im
 
-    class neighborhood:
-        def twoOptInter(self, sol): 
-            # takes solution as input
-            # gets 2 routes randomly
-            # Select random node from each
-            # Swap nodes
-            numRoutes = len(sol.routes) # sol.routes - list
-
-            # Randomly select 2 routes to swap
-            r1 = random.randrange(0,numRoutes)
-            r2 = random.randrange(0,numRoutes)
-
-            # Check if n2 == n1. If true, generate new value for n2.
-            while r2 == r1: 
-                r2 = random.randrange(0,numRoutes)
-
-            # Randomly select nodes to swap from each route
-            n1 = random.randrange(0, len(sol.routes[r1]))
-            n2 = random.randrange(0, len(sol.routes[r2]))
-
-            # Perform Swap
-            _ = sol.routes[r1][n1]
-            sol.routes[r1][n1] = sol.routes[r2][n2]
-            sol.routes[r2][n2] = _
-            return sol
-
-        def doubleBridgeInter(self, sol):
-            # takes solution as input
-            # gets 4 routes randomly
-            # Select random node from each
-            # Swap nodes
-            numRoutes = len(sol.routes) # sol.routes - list
-
-            # Randomly select 2 routes to swap
-            r = list(range(numRoutes))
-            random.shuffle(r)
-            r1, r2, r3, r4 = r[0], r[1], r[2], r[3]
-            
-            # Randomly select nodes to swap from each route
-            n1 = random.randrange(0, len(sol.routes[r1]))
-            n2 = random.randrange(0, len(sol.routes[r2]))
-            n3 = random.randrange(0, len(sol.routes[r3]))
-            n4 = random.randrange(0, len(sol.routes[r4]))
-
-            # Perform Swap - r1 & r3, r2 & r4
-            _ = sol.routes[r1][n1]
-            sol.routes[r1][n1] = sol.routes[r3][n3]
-            sol.routes[r3][n3] = _
-            _ = sol.routes[r2][n2]
-            sol.routes[r2][n2] = sol.routes[r4][n4]
-            sol.routes[r4][n4] = _
-
-            return sol
+    
 
