@@ -3,73 +3,76 @@ import math
 import random
 import threading
 from PIL import Image, ImageDraw
+import Parser as p
 
-class Route(object):
-    def __init__(self, route=[], cost=0, is_valid=False, demand=0):
-        self.is_valid = is_valid
-        self.route = route
-        self.cost = cost
-        self.demand = demand
+class CVRPInfo():
 
-    def insert_route(self, index, route):
-        self.is_valid = False
-        self.route = self.route[:index + 1] + route + self.route[index + 1:]
+    class Solution:
+        def __init__(self, routes=[], cost=0, is_valid=False, demand=0):
+            self.is_valid = is_valid
+            self.routes = routes
+            self.cost = cost
+            self.listDemand = demand
+            self.penalty = 0
 
-    def append_node(self, node):
-        self.is_valid = False
-        self.route = self.route[:-1] + [node] + [1]
+        def shuffle(self):
+            random.shuffle(self.routes)
 
+        def remove_node(self, x):
+            for route in self.routes:
+                if x in route.route:
+                    route.remove_node(x)
+            self.is_valid = False
 
-    def remove_node(self, x):
-        self.is_valid = False
-        del self.route[self.route.index(x)]
+        def insert_route(self, route_id, route_index, route):
+            self.routes[route_id].insert_route(route_index, route)
+            self.is_valid = False
 
-    def __repr__(self):
-        debug_str = ", cost = " + str(self.cost) + ", demand = " + str(self.demand)
-        ret_str = "->".join(str(n) for n in self.route)
-        return ret_str + (debug_str if False else "")
-
-class Solution(object):
-
-    def __init__(self, routes=[], cost=0, is_valid=False, demand=0):
-        self.is_valid = is_valid
-        self.routes = routes
-        self.cost = cost
-        self.demand = demand
-        self.penalty = 0
-
-    def shuffle(self):
-        random.shuffle(self.routes)
-
-    def remove_node(self, x):
-        for route in self.routes:
-            if x in route.route:
-                route.remove_node(x)
-        self.is_valid = False
-
-    def insert_route(self, route_id, route_index, route):
-        self.routes[route_id].insert_route(route_index, route)
-        self.is_valid = False
-
-    def random_subroute(self):
-        r_i = random.randrange(0, len(self.routes))
-        while len(self.routes[r_i].route) == 2:
+        def random_subroute(self):
             r_i = random.randrange(0, len(self.routes))
-        c_s = random.randrange(1, len(self.routes[r_i].route))
-        c_e = c_s
-        while c_e == c_s:
-            c_e = random.randrange(1, len(self.routes[r_i].route))
-        if c_s > c_e:
-            c_s, c_e = c_e, c_s
-        return self.routes[r_i].route[c_s:c_e]
+            while len(self.routes[r_i].route) == 2:
+                r_i = random.randrange(0, len(self.routes))
+            c_s = random.randrange(1, len(self.routes[r_i].route))
+            c_e = c_s
+            while c_e == c_s:
+                c_e = random.randrange(1, len(self.routes[r_i].route))
+            if c_s > c_e:
+                c_s, c_e = c_e, c_s
+            return self.routes[r_i].route[c_s:c_e]
 
-    def hash(self):
-        return hash("-".join([",".join(str(x) for x in x.route) for x in self.routes]))
+        def hash(self):
+            return hash("-".join([",".join(str(x) for x in x.route) for x in self.routes]))
 
-    def __repr__(self):
-        return "\n".join([str(route) for route in self.routes])
+        def __repr__(self):
+            return "\n".join([str(route) for route in self.routes])
 
-class CVRPInfo(object):
+    class Route:
+        def __init__(self, route=[], cost=0, is_valid=False, demand=0):
+            self.is_valid = is_valid
+            self.route = route
+            self.cost = cost
+            self.listDemand = demand
+
+        def insert_route(self, index, route):
+            self.is_valid = False
+            self.route = self.route[:index + 1] + route + self.route[index + 1:]
+
+        def append_node(self, node):
+            self.is_valid = False
+            self.route = self.route[:-1] + [node] + [1]
+
+
+        def remove_node(self, x):
+            self.is_valid = False
+            del self.route[self.route.index(x)]
+
+        def __repr__(self):
+            debug_str = ", cost = " + str(self.cost) + ", demand = " + str(self.listDemand)
+            ret_str = "->".join(str(n) for n in self.route)
+            return ret_str + (debug_str if False else "")
+    
+    class CuckooSearch:
+        pass
 
     def __init__(self, data_file, debug=False):
         self.read_data(data_file)
@@ -80,39 +83,31 @@ class CVRPInfo(object):
         random.seed()
 
     #the vrp file is such an awful format
-    def read_data(self, data_file):
-        with open(data_file) as f:
-            content = [line.rstrip("\n") for line in f.readlines()]
-        self.dimension = int(content[0].split()[-1])
-        self.capacity = int(content[1].split()[-1])
-
-        self.demand = [-1 for _ in range(self.dimension + 1)]
-        self.coords = [(-1, -1) for _ in range(self.dimension + 1)]
-
-        for i in range(3, self.dimension + 3):
-            nid, xc, yc = [float(x) for x in content[i].split()]
-            self.coords[int(nid)] = (xc, yc)
-        for i in range(self.dimension + 4, 2 * (self.dimension + 2)):
-            nid, dem = [int(x) for x in content[i].split()]
-            self.demand[nid] = dem
+    def read_data(self, path):
+        self.listCoord, self.listDemand, self.instanceData = p.parse_file(path)
+        self.fileName = self.instanceData['Name']
+        self.minNumVehicles = self.instanceData['MinNumVehicles']
+        self.optimalValue = self.instanceData['OptimalValue']
+        self.capacity = self.instanceData['Capacity']
+        self.dimension = len(self.listCoord)
 
     def compute_dist(self, n1, n2):
-        n1 = self.coords[n1]
-        n2 = self.coords[n2]
+        n1 = self.listCoord[n1]
+        n2 = self.listCoord[n2]
         return math.sqrt((n1[0] - n2[0])**2 + (n1[1] - n2[1])**2)
 
     def compute_dists(self):
-        self.dist = [list([-1 for _ in range(self.dimension + 1)]) \
-                        for _ in range(self.dimension + 1)]
-        for xi in range(self.dimension + 1):
-            for yi in range(self.dimension + 1):
+        self.dist = [list([-1 for _ in range(self.dimension)]) \
+                        for _ in range(self.dimension)]
+        for xi in range(self.dimension):
+            for yi in range(self.dimension):
                 self.dist[xi][yi] = self.compute_dist(xi, yi)
 
     def bounding_box(self, route):
-        x_min = min(self.coords[node][0] for node in route)
-        x_max = max(self.coords[node][0] for node in route)
-        y_min = min(self.coords[node][1] for node in route)
-        y_max = max(self.coords[node][1] for node in route)
+        x_min = min(self.listCoord[node][0] for node in route)
+        x_max = max(self.listCoord[node][0] for node in route)
+        y_min = min(self.listCoord[node][1] for node in route)
+        y_max = max(self.listCoord[node][1] for node in route)
         return x_min, x_max, y_min, y_max
 
     def make_solution(self, routes):
@@ -130,7 +125,7 @@ class CVRPInfo(object):
         if len(visited) != self.dimension:
             print("NOT ALL VISITED")
             print(visited)
-        sol = Solution(cost=cost, demand=demand, is_valid=is_valid, routes=routes)
+        sol = self.Solution(cost=cost, demand=demand, is_valid=is_valid, routes=routes)
         #raw_input(junk)
         return sol
 
@@ -144,15 +139,15 @@ class CVRPInfo(object):
         for i in range(1, len(node_list)):
             n1, n2 = node_list[i - 1], node_list[i]
             cost += self.dist[n1][n2]
-            demand += self.demand[n2]
+            demand += self.listDemand[n2]
         if demand > self.capacity:
             is_valid = False
 
-        route = Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
+        route = self.Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
 
     def make_random_solution(self, greedy=False):
-        unserviced = [i for i in range(2, self.dimension + 1)]
+        unserviced = [i for i in range(2, self.dimension)]
         #print(unserviced)
         random.shuffle(unserviced)
         routes = []
@@ -166,10 +161,10 @@ class CVRPInfo(object):
                 i = min([i for i in range(len(unserviced))], \
                         key=lambda x: self.dist[cur_route[-1] if random.uniform(0, 1) < 0.9 else 1][unserviced[x]])
             node = unserviced[i]
-            if route_length <= self.max_route_len and route_demand + self.demand[node] <= self.capacity:
+            if route_length <= self.max_route_len and route_demand + self.listDemand[node] <= self.capacity:
                 cur_route += [node]
                 route_length += 1
-                route_demand += self.demand[node]
+                route_demand += self.listDemand[node]
                 #print(cur_route)
                 del unserviced[i]
                 continue
@@ -188,7 +183,7 @@ class CVRPInfo(object):
             route = route_obj.route
             route_obj.demand, route_obj.cost = 0, 0
             for i in range(0, len(route) - 1):
-                route_obj.demand += self.demand[route[i]]
+                route_obj.demand += self.listDemand[route[i]]
                 route_obj.cost += self.dist[route[i]][route[i + 1]]
             solution.cost += route_obj.cost
             solution.demand += route_obj.demand
@@ -229,8 +224,8 @@ class CVRPInfo(object):
 
     def __repr__(self):
         strin = {
-            "coords" : self.coords,
-            "demand" : self.demand,
+            "coords" : self.listCoord,
+            "demand" : self.listDemand,
             #"dists"  : self.dist
         }
         return str(strin)
@@ -246,9 +241,5 @@ class CVRPInfo(object):
             b_c = (i*g_c)%255
             nodes = route.route
             norm = lambda x, y: (2*x + 250, 2*y + 250)
-            draw.line([norm(*self.coords[n]) for n in nodes], fill=(r_c, g_c, b_c), width=2)
+            draw.line([norm(*self.listCoord[n]) for n in nodes], fill=(r_c, g_c, b_c), width=2)
         return im
-
-if __name__ == "__main__":
-    ci = CVRPInfo("fruitybun250.vrp")
-    ci.visualise(ci.make_random_solution())
