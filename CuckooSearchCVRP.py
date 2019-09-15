@@ -2,6 +2,7 @@ from CVRP import CVRPInfo as CVRP
 import operator as o
 import math
 import random
+import timeit
 from copy import deepcopy
 from scipy.stats import levy
 
@@ -14,11 +15,11 @@ class CuckooSearch:
       replace the randomly selected nest.
     - The worse Pa (fraction of nest to be abandoned) nests will be replaced with randomly generated solutions
     - Rank solutions
-    - Keep best solutions
+    - Keep best solution. (In this implementation, nest[0], the current best cannot be abandoned)
     """
 
 
-    def __init__(self, CVRPInstance, numCuckoos = 15, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
+    def __init__(self, CVRPInstance, numCuckoos = 15, Pa = 0.2, Pc = 0.6, generations = 200, pdf_type = 'levy'):
         self.instance = CVRPInstance
         self.Pa = Pa
         self.Pc = Pc
@@ -26,6 +27,7 @@ class CuckooSearch:
         self.pdf_type = pdf_type
         self.numCuckoos = numCuckoos
         self.nests = []
+        self.numFailedAttemptsLevyLimit = 1
         random.seed()
         self.solveInstance()
         
@@ -38,35 +40,43 @@ class CuckooSearch:
             self.nests.append(sol)
         
         for i in range(self.generations):   
-            print('DEBUG: Generation num: ' + str(i))
+            # print('DEBUG: Generation num: ' + str(i))
 
             # sort nests by cost
             self.nests.sort(key = o.attrgetter('cost'))
             best_solution = self.nests[0]
             random.shuffle(self.nests)
 
-            # Search, and Evaluate with fraction Pc of Cuckoos
+            # Search, and Evaluate with fraction Pc of Cuckoos of best cuckoos
             for j in range(math.floor(self.numCuckoos * self.Pc)):
-                print('DEBUG: Levy Flights iteration number ' + str(j))
+                # print('DEBUG: Levy Flights iteration number ' + str(j))
                 _levyNest = deepcopy(self.nests[j])
                 self.__performLevyFlights(_levyNest)
-                print('DEBUG: Levy Flights iteration number ' + str(j) +  ' success')
+                # print('DEBUG: Levy Flights iteration number ' + str(j) +  ' success')
                
                 # Randomly select a nest to compare with
-                _ = random.randrange(0, self.numCuckoos)
+                _ = random.randrange(1, self.numCuckoos)
 
                 # If the generated solution is better than a randomly selected nest
                 if _levyNest.cost < self.nests[_].cost:
                     self.nests[_] = _levyNest
-                    print('DEBUG: Replace Fi with Fj')
+                    # print('DEBUG: Replace Fi with Fj')
             
             # Abandon a fraction Pa of worse Cuckoos. Generate new random solutions for replacement
             self.nests.sort(key = o.attrgetter('cost'), reverse=True)
-            for j in range(math.floor(self.numCuckoos * self.Pa)):
+            # Compute probability of each nest to be abandoned except the best nest
+            for j in range(1, math.floor(self.numCuckoos * self.Pa)):
                 del self.nests[0] # Abandon nest
                 sol = self.instance.create_random_solution()
                 self.nests.append(sol)
-            print('DEBUG: Success, abandon worst nests Pa and generate new random')
+            # print('DEBUG: Success, abandon worst nests Pa and generate new random')
+
+            # Sort from best to worst and keep best solution
+            self.nests.sort(key = o.attrgetter('cost'))
+            best_solution = self.nests[0]
+        
+        print('Dataset: ' + self.instance.fileName + ', Run time: ' + 'test' 
+            + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' + str(self.instance.optimalValue))
 
 
 
@@ -91,16 +101,10 @@ class CuckooSearch:
             doubleBridgeIter = 1
         
         for i in range(twoOptIter):
-            print('DEBUG: Levy Flights twoOpt')
             nest = self.__twoOptInter(nest)
 
         for i in range(doubleBridgeIter):
-            print('DEBUG: Levy Flights doubleBridge')
             nest = self.__doubleBridgeInter(nest)
-        
-        # validate nest
-        # nest.
-        # recalculate nest 
 
     def __twoOptInter(self, sol): 
         # takes solution as input
@@ -114,9 +118,7 @@ class CuckooSearch:
         # Perform Swap
         IsSwapInvalid = True
         numFailedAttempts = 0
-        while IsSwapInvalid:
-            print('DEBUG: Levy Flights twoOpt pre-deepcopy')
-           
+        while IsSwapInvalid:           
             # Randomly select 2 routes to swap
             random.shuffle(r)
             r1, r2 = r[0], r[1]
@@ -133,17 +135,14 @@ class CuckooSearch:
             _solr1.route[n1] = _solr2.route[n2]
             _solr2.route[n2] = _
 
-            print('DEBUG: Levy Flights twoOpt after first swap')
-
             if _solr1.demand <= self.instance.capacity:
                 if _solr2.demand <= self.instance.capacity:
                     sol.routes[r1] = _solr1
                     sol.routes[r2] = _solr2
                     IsSwapInvalid = False
-                    print('DEBUG: Levy Flights twoOpt after complete swap')
             
             numFailedAttempts += 1
-            if numFailedAttempts == 5:
+            if numFailedAttempts == self.numFailedAttemptsLevyLimit:
                 break
 
         return sol
@@ -161,7 +160,6 @@ class CuckooSearch:
         IsSwapInvalid = True
         numFailedAttempts = 0
         while IsSwapInvalid:
-            print('DEBUG: Levy Flights doubleBridge pre-deepcopy')
 
             # re-shuffle routes to swap
             random.shuffle(r)
@@ -186,8 +184,6 @@ class CuckooSearch:
             _solr2.route[n2] = _solr4.route[n4]
             _solr4.route[n4] = _
 
-            print('DEBUG: Levy Flights doubleBridge after first swap')
-
             if _solr1.demand <= self.instance.capacity:
                 if _solr2.demand <= self.instance.capacity:
                     if _solr3.demand <= self.instance.capacity:
@@ -197,20 +193,21 @@ class CuckooSearch:
                             sol.routes[r3] = _solr3
                             sol.routes[r4] = _solr4
                             IsSwapInvalid = False
-                            print('DEBUG: Levy Flights doubleBridge after complete swap')
             numFailedAttempts += 1
-            if numFailedAttempts == 5:
+            if numFailedAttempts == self.numFailedAttemptsLevyLimit:
                 break
 
         return sol
 
     def __repr__(self):
-        pass
+        
         # return filename, 
-        # string = {
-        #     "Name" : self.instance.,
-        #     "listDemand" : self.listDemand,
-        #     #"dists"  : self.dist
-        # }
-        # return str(string)
+        string = {
+            "Name" : self.instance.fileName,
+            "Best Solution Cost" : self.nests[0].cost,
+            "Optimal Value" : self.instance.optimalValue,
+            "Run Time" : 'test',
+            "Solution" : self.nests
+        }
+        return str(string)
     
