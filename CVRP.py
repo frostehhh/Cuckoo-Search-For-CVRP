@@ -9,7 +9,7 @@ class CVRPInfo():
     def __init__(self, data_file):
         self.read_data(data_file)
         self.__compute_dists()
-        self.start_node = 1
+        self.start_node = 0
         self.solutions = [] 
         # self.debug = debug
         # self.max_route_len = 10 # I don't need a max route limiter
@@ -53,9 +53,6 @@ class CVRPInfo():
         sol = Solution(cost=cost, demand=demand, is_valid=is_valid, routes=routes)
         #raw_input(junk)
         return sol
-    
-    def evaluation_solution(self, sol):
-        pass
 
     def create_route(self, node_list):
         if node_list[0] != self.start_node:
@@ -73,48 +70,28 @@ class CVRPInfo():
         route = Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
     
-    def __validate_route(self, route):
-        if route.route[0] != self.start_node:
-            return None
-        cost = 0
-        demand = 0
-        is_valid = True
-
-        for i in range(1, len(route.route)):
-            n1, n2 = route.route[i - 1], route.route[i]
-            cost += self.dist[n1][n2]
-            demand += self.listDemand[n2]
-        if demand > self.capacity:
-            is_valid = False
-
-        return is_valid
-
-    
     def create_random_solution(self, greedy=False):
         unserviced = [i for i in range(2, self.dimension)]
         #print(unserviced)
         random.shuffle(unserviced)
         routes = []
-        cur_route = [1]
+        cur_route = [0] # start with depot node
         route_demand = 0
         route_length = 0
         while unserviced:
-            #print(unserviced)
             i = 0
-            if greedy:
-                i = min([i for i in range(len(unserviced))], \
-                        key=lambda x: self.dist[cur_route[-1] if random.uniform(0, 1) < 0.9 else 1][unserviced[x]])
             node = unserviced[i]
             if route_demand + self.listDemand[node] <= self.capacity:
                 cur_route += [node]
                 route_length += 1
                 route_demand += self.listDemand[node]
-                #print(cur_route)
                 del unserviced[i]
                 continue
-            cur_route += [1]
+            cur_route += [0] # end with depot node
             routes += [self.create_route(cur_route)]
-            cur_route = [1]
+            
+            # Reset variables for next iteration
+            cur_route = [0] 
             route_demand = 0
             route_length = 0
         routes += [self.create_route(cur_route + [1])]
@@ -154,6 +131,9 @@ class CVRPInfo():
             #"dists"  : self.dist
         }
         return str(string)
+    
+    def evaluate_solution(self, sol):
+        pass
 class Solution:
     def __init__(self, routes=[], cost=0, is_valid=False, demand=0):
         self.is_valid = is_valid
@@ -192,6 +172,7 @@ class Solution:
 
     def __repr__(self):
         return "\n".join([str(route) for route in self.routes])
+
 class Route:
     def __init__(self, route=[], cost=0, is_valid=False, demand=0):
         self.is_valid = is_valid
@@ -211,9 +192,29 @@ class Route:
         self.is_valid = False
         del self.route[self.route.index(x)]
 
+    def validate_route(self, CVRPInstance):
+        if self.route[0] != CVRPInstance.start_node:
+            return None
+        cost = 0
+        demand = 0
+        is_valid = True
+
+        for i in range(1, len(self.route)):
+            n1, n2 = self.route[i - 1], self.route[i]
+            cost += CVRPInstance.dist[n1][n2]
+            demand += CVRPInstance.listDemand[n2]
+        if demand > CVRPInstance.capacity:
+            is_valid = False
+
+        return is_valid
+
     def __repr__(self):
         debug_str = ", cost = " + str(self.cost) + ", demand = " + str(self.demand)
         ret_str = "->".join(str(n) for n in self.route)
         return ret_str + (debug_str if False else "")
+
+    
+
+    
 
 

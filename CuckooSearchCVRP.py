@@ -2,6 +2,7 @@ from CVRP import CVRPInfo as CVRP
 import operator as o
 import math
 import random
+from copy import deepcopy
 from scipy.stats import levy
 
 class CuckooSearch:
@@ -90,16 +91,29 @@ class CuckooSearch:
         while r2 == r1: 
             r2 = random.randrange(0,numRoutes)
 
-        # sol.routes[0].route[0]        # Randomly select nodes to swap from each route
-        n1 = random.randrange(1, len(sol.routes[r1].route) - 1) # start with 1 to disregard depot
-        n2 = random.randrange(1, len(sol.routes[r2].route) - 1)
+        
 
         # Perform Swap
-        _ = sol.routes[r1].route[n1]
-        sol.routes[r1].route[n1] = sol.routes[r2].route[n2]
-        sol.routes[r2].route[n2] = _
+        IsSwapInvalid = True
+        # Temporary variables for checking if swap is valid
+        _solr1 = deepcopy(sol.routes[r1])
+        _solr2 = deepcopy(sol.routes[r2])
+        while IsSwapInvalid:
+            # Randomly select nodes to swap from each route
+            n1 = random.randrange(1, len(_solr1.route) - 1) # start with 1 to disregard depot
+            n2 = random.randrange(1, len(_solr2.route) - 1)
+
+            _ = _solr1.route[n1]
+            _solr1.route[n1] = _solr2.route[n2]
+            _solr2.route[n2] = _
+
+            if _solr1.demand <= self.instance.capacity:
+                if _solr2.demand <= self.instance.capacity:
+                    sol.routes[r1] = _solr1
+                    sol.routes[r2] = _solr2
+                    IsSwapInvalid = False
+
         
-        # validate routes generated 
         
 
         return sol
