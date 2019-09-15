@@ -6,75 +6,11 @@ from PIL import Image, ImageDraw
 import Parser as p
 
 class CVRPInfo():
-
-    class Solution:
-        def __init__(self, routes=[], cost=0, is_valid=False, demand=0):
-            self.is_valid = is_valid
-            self.routes = routes
-            self.cost = cost
-            self.listDemand = demand
-            self.penalty = 0
-
-        def shuffle(self):
-            random.shuffle(self.routes)
-
-        def remove_node(self, x):
-            for route in self.routes:
-                if x in route.route:
-                    route.remove_node(x)
-            self.is_valid = False
-
-        def insert_route(self, route_id, route_index, route):
-            self.routes[route_id].insert_route(route_index, route)
-            self.is_valid = False
-
-        def random_subroute(self):
-            r_i = random.randrange(0, len(self.routes))
-            while len(self.routes[r_i].route) == 2:
-                r_i = random.randrange(0, len(self.routes))
-            c_s = random.randrange(1, len(self.routes[r_i].route))
-            c_e = c_s
-            while c_e == c_s:
-                c_e = random.randrange(1, len(self.routes[r_i].route))
-            if c_s > c_e:
-                c_s, c_e = c_e, c_s
-            return self.routes[r_i].route[c_s:c_e]
-
-        def hash(self):
-            return hash("-".join([",".join(str(x) for x in x.route) for x in self.routes]))
-
-        def __repr__(self):
-            return "\n".join([str(route) for route in self.routes])
-    class Route:
-        def __init__(self, route=[], cost=0, is_valid=False, demand=0):
-            self.is_valid = is_valid
-            self.route = route
-            self.cost = cost
-            self.demand = demand
-
-        def insert_route(self, index, route):
-            self.is_valid = False
-            self.route = self.route[:index + 1] + route + self.route[index + 1:]
-
-        def append_node(self, node):
-            self.is_valid = False
-            self.route = self.route[:-1] + [node] + [1]
-
-        def remove_node(self, x):
-            self.is_valid = False
-            del self.route[self.route.index(x)]
-
-        def __repr__(self):
-            debug_str = ", cost = " + str(self.cost) + ", demand = " + str(self.demand)
-            ret_str = "->".join(str(n) for n in self.route)
-            return ret_str + (debug_str if False else "")
-
-    def __init__(self, data_file, CVRPInstance = None):
+    def __init__(self, data_file):
         self.read_data(data_file)
         self.__compute_dists()
         self.start_node = 1
-        if CVRPInstance is not None: # if CVRPInstance was passed
-            self = CVRPInstance
+        self.solutions = [] 
         # self.debug = debug
         # self.max_route_len = 10 # I don't need a max route limiter
         random.seed()
@@ -99,6 +35,8 @@ class CVRPInfo():
             for yi in range(self.dimension):
                 self.dist[xi][yi] = self.__compute_dist(xi, yi)
 
+
+
     def create_solution(self, routes):
         cost = 0
         demand = 0
@@ -114,7 +52,7 @@ class CVRPInfo():
         if len(visited) != self.dimension - 1: # I ADDED THIS, remove depot node from visited.
             print("NOT ALL VISITED")
             print(visited)
-        sol = self.Solution(cost=cost, demand=demand, is_valid=is_valid, routes=routes)
+        sol = Solution(cost=cost, demand=demand, is_valid=is_valid, routes=routes)
         #raw_input(junk)
         return sol
     
@@ -134,7 +72,7 @@ class CVRPInfo():
         if demand > self.capacity:
             is_valid = False
 
-        route = self.Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
+        route = Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
     
     def __validate_route(self, route):
@@ -218,6 +156,66 @@ class CVRPInfo():
             #"dists"  : self.dist
         }
         return str(string)
+class Solution:
+    def __init__(self, routes=[], cost=0, is_valid=False, demand=0):
+        self.is_valid = is_valid
+        self.routes = routes
+        self.cost = cost
+        self.listDemand = demand
+        self.penalty = 0
 
-    
+    def shuffle(self):
+        random.shuffle(self.routes)
+
+    def remove_node(self, x):
+        for route in self.routes:
+            if x in route.route:
+                route.remove_node(x)
+        self.is_valid = False
+
+    def insert_route(self, route_id, route_index, route):
+        self.routes[route_id].insert_route(route_index, route)
+        self.is_valid = False
+
+    def random_subroute(self):
+        r_i = random.randrange(0, len(self.routes))
+        while len(self.routes[r_i].route) == 2:
+            r_i = random.randrange(0, len(self.routes))
+        c_s = random.randrange(1, len(self.routes[r_i].route))
+        c_e = c_s
+        while c_e == c_s:
+            c_e = random.randrange(1, len(self.routes[r_i].route))
+        if c_s > c_e:
+            c_s, c_e = c_e, c_s
+        return self.routes[r_i].route[c_s:c_e]
+
+    def hash(self):
+        return hash("-".join([",".join(str(x) for x in x.route) for x in self.routes]))
+
+    def __repr__(self):
+        return "\n".join([str(route) for route in self.routes])
+class Route:
+    def __init__(self, route=[], cost=0, is_valid=False, demand=0):
+        self.is_valid = is_valid
+        self.route = route
+        self.cost = cost
+        self.demand = demand
+
+    def insert_route(self, index, route):
+        self.is_valid = False
+        self.route = self.route[:index + 1] + route + self.route[index + 1:]
+
+    def append_node(self, node):
+        self.is_valid = False
+        self.route = self.route[:-1] + [node] + [1]
+
+    def remove_node(self, x):
+        self.is_valid = False
+        del self.route[self.route.index(x)]
+
+    def __repr__(self):
+        debug_str = ", cost = " + str(self.cost) + ", demand = " + str(self.demand)
+        ret_str = "->".join(str(n) for n in self.route)
+        return ret_str + (debug_str if False else "")
+
 
