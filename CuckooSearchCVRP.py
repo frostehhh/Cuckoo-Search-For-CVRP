@@ -59,8 +59,16 @@ class CuckooSearch:
                 if _levyNest.cost < self.nests[_].cost:
                     self.nests[_] = _levyNest
                     print('DEBUG: Replace Fi with Fj')
+            
+            # Abandon a fraction Pa of worse Cuckoos. Generate new random solutions for replacement
+            self.nests.sort(key = o.attrgetter('cost'), reverse=True)
+            for j in range(math.floor(self.numCuckoos * self.Pa)):
+                del self.nests[0] # Abandon nest
+                sol = self.instance.create_random_solution()
+                self.nests.append(sol)
+            print('DEBUG: Success, abandon worst nests Pa and generate new random')
 
-                
+
 
     def __performLevyFlights(self, nest):
         # Generate random value x from levy 
@@ -101,33 +109,43 @@ class CuckooSearch:
         # Swap nodes, until valid route is generated
         numRoutes = len(sol.routes) # sol.routes - list
 
-        # Randomly select 2 routes to swap
-        r1 = random.randrange(0,numRoutes)
-        r2 = random.randrange(0,numRoutes)
-
-        # Check if n2 == n1. If true, generate new value for n2.
-        while r2 == r1: 
-            r2 = random.randrange(0,numRoutes)
-
+        r = list(range(numRoutes))
+        
         # Perform Swap
         IsSwapInvalid = True
+        numFailedAttempts = 0
         while IsSwapInvalid:
+            print('DEBUG: Levy Flights twoOpt pre-deepcopy')
+           
+            # Randomly select 2 routes to swap
+            random.shuffle(r)
+            r1, r2 = r[0], r[1]
+
             # Temporary variables for checking if swap is valid
             _solr1 = deepcopy(sol.routes[r1])
             _solr2 = deepcopy(sol.routes[r2])
+
             # Randomly select nodes to swap from each route
             n1 = random.randrange(1, len(_solr1.route) - 1) # start with 1 to disregard depot
             n2 = random.randrange(1, len(_solr2.route) - 1)
-
+            
             _ = _solr1.route[n1]
             _solr1.route[n1] = _solr2.route[n2]
             _solr2.route[n2] = _
+
+            print('DEBUG: Levy Flights twoOpt after first swap')
 
             if _solr1.demand <= self.instance.capacity:
                 if _solr2.demand <= self.instance.capacity:
                     sol.routes[r1] = _solr1
                     sol.routes[r2] = _solr2
                     IsSwapInvalid = False
+                    print('DEBUG: Levy Flights twoOpt after complete swap')
+            
+            numFailedAttempts += 1
+            if numFailedAttempts == 5:
+                break
+
         return sol
 
     def __doubleBridgeInter(self, sol):
@@ -139,30 +157,36 @@ class CuckooSearch:
 
         # Randomly select 4 routes to swap
         r = list(range(numRoutes))
-        random.shuffle(r)
-        r1, r2, r3, r4 = r[0], r[1], r[2], r[3]
-        
-    
         # Perform Swap - r1 & r3, r2 & r4
         IsSwapInvalid = True
+        numFailedAttempts = 0
         while IsSwapInvalid:
+            print('DEBUG: Levy Flights doubleBridge pre-deepcopy')
+
+            # re-shuffle routes to swap
+            random.shuffle(r)
+            r1, r2, r3, r4 = r[0], r[1], r[2], r[3]
+            
             # Temporary variables for checking if swap is valid
             _solr1 = deepcopy(sol.routes[r1])
             _solr2 = deepcopy(sol.routes[r2])
             _solr3 = deepcopy(sol.routes[r3])
             _solr4 = deepcopy(sol.routes[r4])
-            # Randomly select nodes to swap from each route
-            n1 = random.randrange(1, len(sol.routes[r1].route) - 1)
-            n2 = random.randrange(1, len(sol.routes[r2].route) - 1)
-            n3 = random.randrange(1, len(sol.routes[r3].route) - 1)
-            n4 = random.randrange(1, len(sol.routes[r4].route) - 1)
 
-            _ = sol.routes[r1].route[n1]
-            sol.routes[r1].route[n1] = sol.routes[r3].route[n3]
-            sol.routes[r3].route[n3] = _
-            _ = sol.routes[r2].route[n2]
-            sol.routes[r2].route[n2] = sol.routes[r4].route[n4]
-            sol.routes[r4].route[n4] = _
+            # Randomly select nodes to swap from each route
+            n1 = random.randrange(1, len(_solr1.route) - 1)
+            n2 = random.randrange(1, len(_solr2.route) - 1)
+            n3 = random.randrange(1, len(_solr3.route) - 1)
+            n4 = random.randrange(1, len(_solr4.route) - 1)
+
+            _ = _solr1.route[n1]
+            _solr1.route[n1] = _solr3.route[n3]
+            _solr3.route[n3] = _
+            _ = _solr2.route[n2]
+            _solr2.route[n2] = _solr4.route[n4]
+            _solr4.route[n4] = _
+
+            print('DEBUG: Levy Flights doubleBridge after first swap')
 
             if _solr1.demand <= self.instance.capacity:
                 if _solr2.demand <= self.instance.capacity:
@@ -173,6 +197,10 @@ class CuckooSearch:
                             sol.routes[r3] = _solr3
                             sol.routes[r4] = _solr4
                             IsSwapInvalid = False
+                            print('DEBUG: Levy Flights doubleBridge after complete swap')
+            numFailedAttempts += 1
+            if numFailedAttempts == 5:
+                break
 
         return sol
 
