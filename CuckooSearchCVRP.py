@@ -2,12 +2,19 @@ from CVRP import CVRPInfo as CVRP
 import operator as o
 import math
 import random
-import timeit
+import numpy as np
+from timeit import default_timer as timer
 from copy import deepcopy
 from scipy.stats import levy
+from scipy.special import gamma
+from numpy.random import RandomState
+
+
 
 class CuckooSearch:
     """
+    Cuckoo Search CS-Ouaarab with modified LF
+
     For this implementation of Cuckoo Search for the CVRP, the given pseudocode will be followed:
     - Initialize randomly generated solutions
     - With fraction Pc (fraction of cuckoos to perform levy flights), randomly select a cuckoo to
@@ -16,10 +23,13 @@ class CuckooSearch:
     - The worse Pa (fraction of nest to be abandoned) nests will be replaced with randomly generated solutions
     - Rank solutions
     - Keep best solution. (In this implementation, nest[0], the current best cannot be abandoned)
+
+    For Levy flights, Mantegna's algorithm was used. 
+    
     """
 
 
-    def __init__(self, CVRPInstance, numCuckoos = 15, Pa = 0.2, Pc = 0.6, generations = 200, pdf_type = 'levy'):
+    def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
         self.instance = CVRPInstance
         self.Pa = Pa
         self.Pc = Pc
@@ -29,11 +39,16 @@ class CuckooSearch:
         self.nests = []
         self.numFailedAttemptsLevyLimit = 1
         random.seed()
+
+        start = timer()
         self.solveInstance()
-        
+        end = timer()
+
+        print('Dataset: ' + self.instance.fileName + ', Run time: ' + str(end - start) 
+            + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' 
+            + str(self.instance.optimalValue))
 
     def solveInstance(self):
-        
         # Initialize Solutions
         for i in range(self.numCuckoos):
             sol = self.instance.create_random_solution() # Initialize Solution
@@ -44,15 +59,12 @@ class CuckooSearch:
 
             # sort nests by cost
             self.nests.sort(key = o.attrgetter('cost'))
-            best_solution = self.nests[0]
             random.shuffle(self.nests)
 
             # Search, and Evaluate with fraction Pc of Cuckoos of best cuckoos
             for j in range(math.floor(self.numCuckoos * self.Pc)):
-                # print('DEBUG: Levy Flights iteration number ' + str(j))
                 _levyNest = deepcopy(self.nests[j])
                 self.__performLevyFlights(_levyNest)
-                # print('DEBUG: Levy Flights iteration number ' + str(j) +  ' success')
                
                 # Randomly select a nest to compare with
                 _ = random.randrange(1, self.numCuckoos)
@@ -73,19 +85,43 @@ class CuckooSearch:
 
             # Sort from best to worst and keep best solution
             self.nests.sort(key = o.attrgetter('cost'))
-            best_solution = self.nests[0]
         
-        print('Dataset: ' + self.instance.fileName + ', Run time: ' + 'test' 
-            + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' + str(self.instance.optimalValue))
+    def __generateLevyStep(self):
+        # mantegna's algorithm
+        beta = 1
+        stepsize = 1
+        sigma = ((gamma(1 + beta)) * math.sin(math.pi*beta/2)) / ( beta * gamma((1+beta)/2) * math.pow(2,(beta-1)/2) )
+        u = np.random.normal(loc=0,scale=sigma)
+        v = np.random.normal(loc=0,scale=1)
+        steplength = u/ math.pow(abs(v),1/beta)
+        u = np.random.normal(loc=0,scale=sigma)
+        v = np.random.normal(loc=0,scale=1)
+        steplength = u/ math.pow(abs(v),1/beta)
+        step = stepsize*steplength
+        step = abs(step)
 
-
+        # not mantegna's algorithm. I'm sure this ain't right tho
+        if step >= 0 and step <= 1:
+            return 0.2
+        elif step > 1 and step <= 2:
+            return 0.4
+        elif step > 2 and step <= 3:
+            return 0.6
+        elif step > 3 and step <= 4:
+            return 0.8
+        elif step > 4 and step <= 5:
+            return 1
+        else:
+            return 1
 
     def __performLevyFlights(self, nest):
         # Generate random value x from levy 
         # According to randomly generated value, perform 2-opt x time or double-bridge
 
-        # temporary random num gen
-        r = random.random()
+        # # temporary random num gen
+        # r = random.random()
+
+        r = self.__generateLevyStep()
         
         twoOptIter = 0
         doubleBridgeIter = 0
@@ -198,6 +234,7 @@ class CuckooSearch:
                 break
 
         return sol
+
 
     def __repr__(self):
         

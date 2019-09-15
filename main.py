@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import regex as re
 import Parser as p
-import timeit
 from CVRP import CVRPInfo as CVRP
 from CuckooSearchCVRP import CuckooSearch
 
