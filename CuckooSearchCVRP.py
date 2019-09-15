@@ -31,20 +31,29 @@ class CuckooSearch:
         
 
     def solveInstance(self):
+        
+        # Initialize Solutions
         for i in range(self.numCuckoos):
             sol = self.instance.create_random_solution() # Initialize Solution
             self.nests.append(sol)
+        
+        for i in range(self.generations):   
+            print('DEBUG: Generation num: ' + str(i))
 
-        # sort nests by cost
-        self.nests.sort(key = o.attrgetter('cost'))
-        best_solution = self.nests[0]
-        random.shuffle(self.nests)
+            # sort nests by cost
+            self.nests.sort(key = o.attrgetter('cost'))
+            best_solution = self.nests[0]
+            random.shuffle(self.nests)
 
-        # Search, and Evaluate
-        for i in range(math.floor(self.numCuckoos * self.Pc)):
-            self.__performLevyFlights(self.nests[i])
-            # Randomly select another nest to compare with, 
-            # Is Fi > Fj? replace
+            # Search, and Evaluate with fraction Pc of Cuckoos
+            for j in range(math.floor(self.numCuckoos * self.Pc)):
+                print('DEBUG: Levy Flights iteration number ' + str(j))
+                self.__performLevyFlights(self.nests[j])
+                print('DEBUG: Levy Flights iteration number ' + str(j) +  ' success')
+            
+
+                # Randomly select another nest to compare with, 
+                # Is Fi > Fj? replace
 
     def __performLevyFlights(self, nest):
         # Generate random value x from levy 
@@ -67,9 +76,11 @@ class CuckooSearch:
             doubleBridgeIter = 1
         
         for i in range(twoOptIter):
+            print('DEBUG: Levy Flights twoOpt')
             nest = self.__twoOptInter(nest)
 
         for i in range(doubleBridgeIter):
+            print('DEBUG: Levy Flights doubleBridge')
             nest = self.__doubleBridgeInter(nest)
         
         # validate nest

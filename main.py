@@ -2,8 +2,10 @@ import pandas as pd
 import os
 import regex as re
 import Parser as p
+import timeit
 from CVRP import CVRPInfo as CVRP
 from CuckooSearchCVRP import CuckooSearch
+
 #region Initialize Parameters
 #Initialize Cuckoo SearchParameters
 numNests = 25
@@ -36,5 +38,5 @@ for dataset in DataSetA:
         # c = cv. (listCoord, listDemand, InstanceData)
         CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
         solver = CuckooSearch(CVRPInstance)
-        print(solver.solveInstance())
+        solver.solveInstance()
 #endregion

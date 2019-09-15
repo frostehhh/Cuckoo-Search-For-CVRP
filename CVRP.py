@@ -47,11 +47,11 @@ class CVRPInfo():
                 visited.add(x)
             cost += route.cost
             demand += route.demand
-        if len(visited) != self.dimension - 1: # I ADDED THIS, remove depot node from visited.
-            print("NOT ALL VISITED")
-            print(visited)
+        # if len(visited) != self.dimension - 1: # I ADDED THIS, remove depot node from visited.
+        #     print("NOT ALL VISITED")
+        #     print(visited)
         sol = Solution(cost=cost, demand=demand, is_valid=is_valid, routes=routes)
-        #raw_input(junk)
+        # print('DEBUG: Created solution of' + self.fileName)
         return sol
 
     def create_route(self, node_list):
