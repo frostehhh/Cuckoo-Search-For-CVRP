@@ -80,7 +80,7 @@ class CuckooSearch:
         # takes solution as input
         # gets 2 routes randomly
         # Select random node from each
-        # Swap nodes
+        # Swap nodes, until valid route is generated
         numRoutes = len(sol.routes) # sol.routes - list
 
         # Randomly select 2 routes to swap
@@ -91,14 +91,12 @@ class CuckooSearch:
         while r2 == r1: 
             r2 = random.randrange(0,numRoutes)
 
-        
-
         # Perform Swap
         IsSwapInvalid = True
-        # Temporary variables for checking if swap is valid
-        _solr1 = deepcopy(sol.routes[r1])
-        _solr2 = deepcopy(sol.routes[r2])
         while IsSwapInvalid:
+            # Temporary variables for checking if swap is valid
+            _solr1 = deepcopy(sol.routes[r1])
+            _solr2 = deepcopy(sol.routes[r2])
             # Randomly select nodes to swap from each route
             n1 = random.randrange(1, len(_solr1.route) - 1) # start with 1 to disregard depot
             n2 = random.randrange(1, len(_solr2.route) - 1)
@@ -112,37 +110,51 @@ class CuckooSearch:
                     sol.routes[r1] = _solr1
                     sol.routes[r2] = _solr2
                     IsSwapInvalid = False
-
-        
-        
-
         return sol
 
     def __doubleBridgeInter(self, sol):
         # takes solution as input
         # gets 4 routes randomly
         # Select random node from each
-        # Swap nodes
+        # Swap nodes, until valid route is generated
         numRoutes = len(sol.routes) # sol.routes - list
 
-        # Randomly select 2 routes to swap
+        # Randomly select 4 routes to swap
         r = list(range(numRoutes))
         random.shuffle(r)
         r1, r2, r3, r4 = r[0], r[1], r[2], r[3]
         
-        # Randomly select nodes to swap from each route
-        n1 = random.randrange(1, len(sol.routes[r1].route) - 1)
-        n2 = random.randrange(1, len(sol.routes[r2].route) - 1)
-        n3 = random.randrange(1, len(sol.routes[r3].route) - 1)
-        n4 = random.randrange(1, len(sol.routes[r4].route) - 1)
-
+    
         # Perform Swap - r1 & r3, r2 & r4
-        _ = sol.routes[r1].route[n1]
-        sol.routes[r1].route[n1] = sol.routes[r3].route[n3]
-        sol.routes[r3].route[n3] = _
-        _ = sol.routes[r2].route[n2]
-        sol.routes[r2].route[n2] = sol.routes[r4].route[n4]
-        sol.routes[r4].route[n4] = _
+        IsSwapInvalid = True
+        while IsSwapInvalid:
+            # Temporary variables for checking if swap is valid
+            _solr1 = deepcopy(sol.routes[r1])
+            _solr2 = deepcopy(sol.routes[r2])
+            _solr3 = deepcopy(sol.routes[r3])
+            _solr4 = deepcopy(sol.routes[r4])
+            # Randomly select nodes to swap from each route
+            n1 = random.randrange(1, len(sol.routes[r1].route) - 1)
+            n2 = random.randrange(1, len(sol.routes[r2].route) - 1)
+            n3 = random.randrange(1, len(sol.routes[r3].route) - 1)
+            n4 = random.randrange(1, len(sol.routes[r4].route) - 1)
+
+            _ = sol.routes[r1].route[n1]
+            sol.routes[r1].route[n1] = sol.routes[r3].route[n3]
+            sol.routes[r3].route[n3] = _
+            _ = sol.routes[r2].route[n2]
+            sol.routes[r2].route[n2] = sol.routes[r4].route[n4]
+            sol.routes[r4].route[n4] = _
+
+            if _solr1.demand <= self.instance.capacity:
+                if _solr2.demand <= self.instance.capacity:
+                    if _solr3.demand <= self.instance.capacity:
+                       if _solr4.demand <= self.instance.capacity:
+                            sol.routes[r1] = _solr1
+                            sol.routes[r2] = _solr2
+                            sol.routes[r3] = _solr3
+                            sol.routes[r4] = _solr4
+                            IsSwapInvalid = False
 
         return sol
 
