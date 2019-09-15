@@ -60,7 +60,6 @@ class CVRPInfo():
             self.is_valid = False
             self.route = self.route[:-1] + [node] + [1]
 
-
         def remove_node(self, x):
             self.is_valid = False
             del self.route[self.route.index(x)]
@@ -74,7 +73,7 @@ class CVRPInfo():
         self.read_data(data_file)
         self.__compute_dists()
         self.start_node = 1
-        if CVRPInstance is not None:
+        if CVRPInstance is not None: # if CVRPInstance was passed
             self = CVRPInstance
         # self.debug = debug
         # self.max_route_len = 10 # I don't need a max route limiter
@@ -118,7 +117,9 @@ class CVRPInfo():
         sol = self.Solution(cost=cost, demand=demand, is_valid=is_valid, routes=routes)
         #raw_input(junk)
         return sol
-
+    
+    def evaluation_solution(self, sol):
+        pass
 
     def create_route(self, node_list):
         if node_list[0] != self.start_node:
@@ -135,6 +136,22 @@ class CVRPInfo():
 
         route = self.Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
+    
+    def __validate_route(self, route):
+        if route.route[0] != self.start_node:
+            return None
+        cost = 0
+        demand = 0
+        is_valid = True
+
+        for i in range(1, len(route.route)):
+            n1, n2 = route.route[i - 1], route.route[i]
+            cost += self.dist[n1][n2]
+            demand += self.listDemand[n2]
+        if demand > self.capacity:
+            is_valid = False
+
+        return is_valid
 
     
     def create_random_solution(self, greedy=False):
@@ -181,16 +198,7 @@ class CVRPInfo():
                 route_obj.is_valid = False
                 solution.is_valid = False
 
-    def __repr__(self):
-        string = {
-            "listCoord" : self.listCoord,
-            "listDemand" : self.listDemand,
-            #"dists"  : self.dist
-        }
-        return str(string)
-
     def visualise(self, solution):
-
         im = Image.new( 'RGB', (500,500), "white") # create a new black image
         draw = ImageDraw.Draw(im)
         color = (0, 0, 0)
@@ -202,6 +210,14 @@ class CVRPInfo():
             norm = lambda x, y: (2*x + 250, 2*y + 250)
             draw.line([norm(*self.listCoord[n]) for n in nodes], fill=(r_c, g_c, b_c), width=2)
         return im
+    
+    def __repr__(self):
+        string = {
+            "listCoord" : self.listCoord,
+            "listDemand" : self.listDemand,
+            #"dists"  : self.dist
+        }
+        return str(string)
 
     
 

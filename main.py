@@ -3,7 +3,7 @@ import os
 import regex as re
 import Parser as p
 from CVRP import CVRPInfo as CVRP
-from CuckooSearchCVRP import CuckooSearch as CuckooSearch
+from CuckooSearchCVRP import CuckooSearch
 #region Initialize Parameters
 #Initialize Cuckoo SearchParameters
 numNests = 25

@@ -70,6 +70,10 @@ class CuckooSearch:
 
         for i in range(doubleBridgeIter):
             nest = self.__doubleBridgeInter(nest)
+        
+        # validate nest
+        # nest.
+        # recalculate nest 
 
     def __twoOptInter(self, sol): 
         # takes solution as input
@@ -85,15 +89,19 @@ class CuckooSearch:
         # Check if n2 == n1. If true, generate new value for n2.
         while r2 == r1: 
             r2 = random.randrange(0,numRoutes)
+
         # sol.routes[0].route[0]        # Randomly select nodes to swap from each route
-        n1 = random.randrange(0, len(sol.routes[r1].route))
-        n2 = random.randrange(0, len(sol.routes[r2].route))
+        n1 = random.randrange(1, len(sol.routes[r1].route) - 1) # start with 1 to disregard depot
+        n2 = random.randrange(1, len(sol.routes[r2].route) - 1)
 
         # Perform Swap
         _ = sol.routes[r1].route[n1]
         sol.routes[r1].route[n1] = sol.routes[r2].route[n2]
         sol.routes[r2].route[n2] = _
-            
+        
+        # validate routes generated 
+        
+
         return sol
 
     def __doubleBridgeInter(self, sol):
@@ -109,10 +117,10 @@ class CuckooSearch:
         r1, r2, r3, r4 = r[0], r[1], r[2], r[3]
         
         # Randomly select nodes to swap from each route
-        n1 = random.randrange(0, len(sol.routes[r1].route))
-        n2 = random.randrange(0, len(sol.routes[r2].route))
-        n3 = random.randrange(0, len(sol.routes[r3].route))
-        n4 = random.randrange(0, len(sol.routes[r4].route))
+        n1 = random.randrange(1, len(sol.routes[r1].route) - 1)
+        n2 = random.randrange(1, len(sol.routes[r2].route) - 1)
+        n3 = random.randrange(1, len(sol.routes[r3].route) - 1)
+        n4 = random.randrange(1, len(sol.routes[r4].route) - 1)
 
         # Perform Swap - r1 & r3, r2 & r4
         _ = sol.routes[r1].route[n1]
