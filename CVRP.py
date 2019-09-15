@@ -35,8 +35,6 @@ class CVRPInfo():
             for yi in range(self.dimension):
                 self.dist[xi][yi] = self.__compute_dist(xi, yi)
 
-
-
     def create_solution(self, routes):
         cost = 0
         demand = 0
