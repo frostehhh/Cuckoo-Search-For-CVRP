@@ -48,12 +48,19 @@ class CuckooSearch:
             # Search, and Evaluate with fraction Pc of Cuckoos
             for j in range(math.floor(self.numCuckoos * self.Pc)):
                 print('DEBUG: Levy Flights iteration number ' + str(j))
-                self.__performLevyFlights(self.nests[j])
+                _levyNest = deepcopy(self.nests[j])
+                self.__performLevyFlights(_levyNest)
                 print('DEBUG: Levy Flights iteration number ' + str(j) +  ' success')
-            
+               
+                # Randomly select a nest to compare with
+                _ = random.randrange(0, self.numCuckoos)
 
-                # Randomly select another nest to compare with, 
-                # Is Fi > Fj? replace
+                # If the generated solution is better than a randomly selected nest
+                if _levyNest.cost < self.nests[_].cost:
+                    self.nests[_] = _levyNest
+                    print('DEBUG: Replace Fi with Fj')
+
+                
 
     def __performLevyFlights(self, nest):
         # Generate random value x from levy 
