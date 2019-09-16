@@ -43,8 +43,9 @@ class CuckooSearch:
         start = timer()
         self.solveInstance()
         end = timer()
-
-        print('Dataset: ' + self.instance.fileName + ', Run time: ' + str(end - start) 
+        time = str("{0:.2f}".format(end - start)) 
+    
+        print('Dataset: ' + self.instance.fileName + ', Run time: ' + time 
             + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' 
             + str(self.instance.optimalValue))
 
@@ -85,8 +86,79 @@ class CuckooSearch:
 
             # Sort from best to worst and keep best solution
             self.nests.sort(key = o.attrgetter('cost'))
+    
+    #region first implementation, range 0-5 of levy distrib considered. xiao
+    # def __generateLevyStep(self):
+    #     """
+    #     In this implementation, a random value is generated from levy distribution using mantegna's algorithms.
+    #     A levy flight will be generated as follows:
+
+    #     levy step
+    #     0 - 1, 0.2
+    #     1 - 2, 0.4
+    #     2 - 3, 0.6
+    #     3 - 4, 0.8
+    #     4 - 5, 1
+    #     """
+    #     # mantegna's algorithm
+    #     beta = 1
+    #     stepsize = 1
+    #     sigma = ((gamma(1 + beta)) * math.sin(math.pi*beta/2)) / ( beta * gamma((1+beta)/2) * math.pow(2,(beta-1)/2) )
+    #     u = np.random.normal(loc=0,scale=sigma)
+    #     v = np.random.normal(loc=0,scale=1)
+    #     steplength = u/ math.pow(abs(v),1/beta)
+    #     step = stepsize*steplength
+    #     step = abs(step)
+
+    #     # not mantegna's algorithm. I'm sure this ain't right tho
+    #     if step >= 0 and step <= 1:
+    #         return 0.2
+    #     elif step > 1 and step <= 2:
+    #         return 0.4
+    #     elif step > 2 and step <= 3:
+    #         return 0.6
+    #     elif step > 3 and step <= 4:
+    #         return 0.8
+    #     elif step > 4 and step <= 5:
+    #         return 1
+    #     else:
+    #         return 1
+
+    # def __performLevyFlights(self, nest):
+    #     # Generate random value x from levy 
+    #     # According to randomly generated value, perform 2-opt x time or double-bridge
+
+    #     # # temporary random num gen
+    #     # r = random.random()
+
+    #     r = self.__generateLevyStep()
         
+    #     twoOptIter = 0
+    #     doubleBridgeIter = 0
+    #     if r >= 0 and r <= 0.2:
+    #         twoOptIter = 1
+    #     elif r > 0.2 and r <= 0.4:
+    #         twoOptIter = 2
+    #     elif r > 0.4 and r <= 0.6:
+    #         twoOptIter = 3
+    #     elif r > 0.6 and r <= 0.8:
+    #         twoOptIter = 4
+    #     elif r > 0.8 and r <= 1.0:
+    #         doubleBridgeIter = 1
+        
+    #     for i in range(twoOptIter):
+    #         nest = self.__twoOptInter(nest)
+
+    #     for i in range(doubleBridgeIter):
+    #         nest = self.__doubleBridgeInter(nest)
+    #endregion
+
+    #region original levy flight implementation, levy step = number of 2-opt
     def __generateLevyStep(self):
+        """
+        In this implementation, a random value is generated from levy distribution using mantegna's algorithms.
+
+        """
         # mantegna's algorithm
         beta = 1
         stepsize = 1
@@ -94,25 +166,10 @@ class CuckooSearch:
         u = np.random.normal(loc=0,scale=sigma)
         v = np.random.normal(loc=0,scale=1)
         steplength = u/ math.pow(abs(v),1/beta)
-        u = np.random.normal(loc=0,scale=sigma)
-        v = np.random.normal(loc=0,scale=1)
-        steplength = u/ math.pow(abs(v),1/beta)
         step = stepsize*steplength
         step = abs(step)
-
-        # not mantegna's algorithm. I'm sure this ain't right tho
-        if step >= 0 and step <= 1:
-            return 0.2
-        elif step > 1 and step <= 2:
-            return 0.4
-        elif step > 2 and step <= 3:
-            return 0.6
-        elif step > 3 and step <= 4:
-            return 0.8
-        elif step > 4 and step <= 5:
-            return 1
-        else:
-            return 1
+        
+        return step
 
     def __performLevyFlights(self, nest):
         # Generate random value x from levy 
@@ -123,24 +180,58 @@ class CuckooSearch:
 
         r = self.__generateLevyStep()
         
-        twoOptIter = 0
-        doubleBridgeIter = 0
-        if r >= 0 and r <= 0.2:
-            twoOptIter = 1
-        elif r > 0.2 and r <= 0.4:
-            twoOptIter = 2
-        elif r > 0.4 and r <= 0.6:
-            twoOptIter = 3
-        elif r > 0.6 and r <= 0.8:
-            twoOptIter = 4
-        elif r > 0.8 and r <= 1.0:
-            doubleBridgeIter = 1
+        twoOptIter = math.floor(r)
+        doubleBridgeIter = 1
         
         for i in range(twoOptIter):
             nest = self.__twoOptInter(nest)
 
         for i in range(doubleBridgeIter):
             nest = self.__doubleBridgeInter(nest)
+    #endregion
+
+    #region gaussian, not done
+    # def __generateLevyStep(self):
+    #     """
+    #     In this implementation, a random value is generated from levy distribution using mantegna's algorithms.
+    #     A levy flight will be generated as follows:
+
+    #     levy step
+    #     0 - 1, 0.2
+    #     1 - 2, 0.4
+    #     2 - 3, 0.6
+    #     3 - 4, 0.8
+    #     4 - 5, 1
+    #     """
+    #     # mantegna's algorithm
+    #     stepsize = 5
+    #     steplength = np.random.normal(loc=0,scale=1)
+    #     step = stepsize*steplength
+    #     step = abs(step)
+        
+    #     return step
+
+    # def __performLevyFlights(self, nest):
+    #     # Generate random value x from levy 
+    #     # According to randomly generated value, perform 2-opt x time or double-bridge
+
+    #     # # temporary random num gen
+    #     # r = random.random()
+
+    #     r = self.__generateLevyStep()
+        
+    #     twoOptIter = 0
+    #     doubleBridgeIter = 0
+    #     if r >= 0 and r <= 0.2:
+    #         twoOptIter = 1
+        
+        
+    #     for i in range(twoOptIter):
+    #         nest = self.__twoOptInter(nest)
+
+    #     for i in range(doubleBridgeIter):
+    #         nest = self.__doubleBridgeInter(nest)
+    #endregion
 
     def __twoOptInter(self, sol): 
         # takes solution as input

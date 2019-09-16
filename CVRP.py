@@ -72,7 +72,6 @@ class CVRPInfo():
     
     def create_random_solution(self):
         unserviced = [i for i in range(1, self.dimension)]
-        #print(unserviced)
         random.shuffle(unserviced)
         routes = []
         cur_route = [0] # start with depot node
@@ -94,7 +93,7 @@ class CVRPInfo():
             cur_route = [0] 
             route_demand = 0
             route_length = 0
-        routes += [self.create_route(cur_route + [1])]
+        routes += [self.create_route(cur_route + [0])]
         return self.create_solution(routes)
 
     def refresh(self, solution):
