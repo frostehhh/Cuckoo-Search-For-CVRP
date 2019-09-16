@@ -70,10 +70,36 @@ class CVRPInfo():
         route = Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
     
+    #region create random solution, add 1 node per route in each iteration
+    # def create_random_solution(self):
+    #     unserviced = [i for i in range(1, self.dimension)]
+    #     random.shuffle(unserviced)
+    #     routes = [[0] for i in range(self.minNumVehicles)] #list of all routes
+    #     route_demand = [0 for i in range(self.minNumVehicles)]
+    #     # route_length = 0 # unnecessary
+    #     # iterate through each route
+    #     # randomly select an unserviced node to add to that current route
+    #     while unserviced:
+    #         currRoute = 0
+    #         node = unserviced[0]
+    #         if route_demand[currRoute] + self.listDemand[node] <= self.capacity:
+                
+    #             del unserviced[0]
+    #             continue
+            
+            
+            
+    #         currRoute += 0
+    #     routes += [self.create_route(cur_route)]
+    #     routes += [self.create_route(cur_route + [0])]
+    #     return self.create_solution(routes)
+    #endregion
+
+    #region original create random solution
     def create_random_solution(self):
         unserviced = [i for i in range(1, self.dimension)]
         random.shuffle(unserviced)
-        routes = []
+        routes = [] # list of all routes
         cur_route = [0] # start with depot node
         route_demand = 0
         route_length = 0
@@ -86,15 +112,15 @@ class CVRPInfo():
                 route_demand += self.listDemand[node]
                 del unserviced[i]
                 continue
-            cur_route += [0] # end with depot node
-            routes += [self.create_route(cur_route)]
-            
-            # Reset variables for next iteration
-            cur_route = [0] 
-            route_demand = 0
-            route_length = 0
-        routes += [self.create_route(cur_route + [0])]
+            else:
+                routes += [self.create_route(cur_route + [0])] # end with depot node
+                # Reset variables for next iteration
+                cur_route = [0] 
+                route_demand = 0
+                route_length = 0
+        # routes += [self.create_route(cur_route + [0])]
         return self.create_solution(routes)
+    #endregion
 
     def refresh(self, solution):
         solution.cost, solution.demand = 0, 0
