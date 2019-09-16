@@ -70,7 +70,7 @@ class CVRPInfo():
         route = Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
     
-    def create_random_solution(self, greedy=False):
+    def create_random_solution(self):
         unserviced = [i for i in range(1, self.dimension)]
         #print(unserviced)
         random.shuffle(unserviced)

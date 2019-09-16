@@ -29,8 +29,6 @@ DataSetB = os.listdir(DataSetBPath) # list of file names of benchmark instances 
 DataSetP = os.listdir(DataSetPPath) # list of file names of benchmark instances from Set P
 #end region
 
-#region Main
-#load all datasets from Set A
 for dataset in DataSetA:
         CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
         solver = CuckooSearch(CVRPInstance)
@@ -45,4 +43,5 @@ for dataset in DataSetP:
         CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
         solver = CuckooSearch(CVRPInstance)
         solver.solveInstance()
-#endregion
+
+

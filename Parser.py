@@ -6,7 +6,7 @@ rx_dict = {
     'capacity': re.compile(r'CAPACITY : (?P<capacity>[0-9]+)\n'),
     'node_coord': re.compile(r'NODE_COORD_SECTION'),
     'demand_values': re.compile(r'DEMAND_SECTION'),
-    'values' : re.compile(r'[0-9]* (?P<x>[0-9]+) (?P<y>[0-9]+)?') # test this
+    'values' : re.compile(r'[0-9]* (?P<x>[0-9]+)( )?(?P<y>[0-9]+)?( )?(\\n)?') # test this
 }
 
 def _parse_line(line):
