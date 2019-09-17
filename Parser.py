@@ -71,6 +71,8 @@ def parse_file(filepath):
             elif key == 'demand_values':
                 IsNodeCoord = False
                 IsDemandValue = True
+            elif IsDemandValue == True and key != 'values':
+                IsDemandValue = False
             elif IsNodeCoord and key == 'values':
                 x = int(match.group('x'))
                 y = int(match.group('y'))

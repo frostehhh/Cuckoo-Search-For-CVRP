@@ -47,7 +47,7 @@ class CuckooSearch:
     
         print('Dataset: ' + self.instance.fileName + ', Run time: ' + time 
             + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' 
-            + str(self.instance.optimalValue))
+            + str(self.instance.optimalValue) + ' routesGen(gen, min) = ' + str(len(self.nests[0].routes)) + ', ' + str(self.instance.minNumVehicles))
 
     def solveInstance(self):
         # Initialize Solutions
