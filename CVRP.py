@@ -12,8 +12,6 @@ class CVRPInfo():
         self.__compute_dists()
         self.start_node = 0
         self.solutions = [] 
-        # self.debug = debug
-        # self.max_route_len = 10 # I don't need a max route limiter
         random.seed()
 
     def read_data(self, path):
@@ -40,19 +38,12 @@ class CVRPInfo():
         cost = 0
         demand = 0
         is_valid = True
-        visited = set()
         for route in routes:
             if not route.is_valid:
                 is_valid = False
-            for x in route.route:
-                visited.add(x)
             cost += route.cost
             demand += route.demand
-        # if len(visited) != self.dimension - 1: # I ADDED THIS, remove depot node from visited.
-        #     print("NOT ALL VISITED")
-        #     print(visited)
         sol = Solution(cost=cost, demand=demand, is_valid=is_valid, routes=routes)
-        # print('DEBUG: Created solution of' + self.fileName)
         return sol
 
     def create_route(self, node_list):
@@ -70,7 +61,26 @@ class CVRPInfo():
 
         route = Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
+
+    def recalculate_route_demand_cost(self, route):
+        cost = 0
+        demand = 0
+        is_valid = True
+        for i in range(len(route.route)):
+            n1, n2 = route.route[i - 1], route.route[i]
+            cost += self.dist[n1][n2]
+            demand += self.listDemand[n2]
+        route.cost = cost
+        route.demand = demand
+        return route
     
+    def recalculate_solution_cost(self, sol):
+        cost = 0
+        for route in sol.routes:
+            cost += route.cost
+        sol.cost = cost
+        return sol        
+
     #region original create random solution
     def create_random_solution(self):
         unserviced = [i for i in range(1, self.dimension)]
@@ -232,7 +242,7 @@ class Solution:
         self.is_valid = is_valid
         self.routes = routes
         self.cost = cost
-        self.listDemand = demand
+        self.demand = demand
         self.penalty = 0
 
     def shuffle(self):

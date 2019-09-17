@@ -44,10 +44,16 @@ class CuckooSearch:
         self.solveInstance()
         end = timer()
         time = str("{0:.2f}".format(end - start)) 
-    
+        
+        lenRoute = 0
+        for route in self.nests[0].routes:
+            lenRoute += len(route.route) - 2
+
         print('Dataset: ' + self.instance.fileName + ', Run time: ' + time 
             + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' 
-            + str(self.instance.optimalValue) + ' routesGen(gen, min) = ' + str(len(self.nests[0].routes)) + ', ' + str(self.instance.minNumVehicles))
+            + str(self.instance.optimalValue) + ' routesGen(gen, min) = ' + str(len(self.nests[0].routes)) 
+            + ', ' + str(self.instance.minNumVehicles) + ' numNodes(gen, req) = ' 
+            + str(lenRoute) + ', ' + str(self.instance.dimension))
 
     def solveInstance(self):
         # Initialize Solutions
@@ -56,11 +62,8 @@ class CuckooSearch:
             self.nests.append(sol)
         
         for i in range(self.generations):   
-            # print('DEBUG: Generation num: ' + str(i))
-
             # sort nests by cost
             self.nests.sort(key = o.attrgetter('cost'))
-            random.shuffle(self.nests)
 
             # Search, and Evaluate with fraction Pc of Cuckoos of best cuckoos
             for j in range(math.floor(self.numCuckoos * self.Pc)):
@@ -68,12 +71,11 @@ class CuckooSearch:
                 self.__performLevyFlights(_levyNest)
                
                 # Randomly select a nest to compare with
-                _ = random.randrange(1, self.numCuckoos)
+                _nestCompare = random.randrange(1, self.numCuckoos)
 
                 # If the generated solution is better than a randomly selected nest
-                if _levyNest.cost < self.nests[_].cost:
-                    self.nests[_] = _levyNest
-                    # print('DEBUG: Replace Fi with Fj')
+                if _levyNest.cost < self.nests[_nestCompare].cost:
+                    self.nests[_nestCompare] = deepcopy(_levyNest)
             
             # Abandon a fraction Pa of worse Cuckoos. Generate new random solutions for replacement
             self.nests.sort(key = o.attrgetter('cost'), reverse=True)
@@ -82,7 +84,6 @@ class CuckooSearch:
                 del self.nests[0] # Abandon nest
                 sol = self.instance.create_random_solution()
                 self.nests.append(sol)
-            # print('DEBUG: Success, abandon worst nests Pa and generate new random')
 
             # Sort from best to worst and keep best solution
             self.nests.sort(key = o.attrgetter('cost'))
@@ -175,13 +176,10 @@ class CuckooSearch:
         # Generate random value x from levy 
         # According to randomly generated value, perform 2-opt x time or double-bridge
 
-        # # temporary random num gen
-        # r = random.random()
-
         r = self.__generateLevyStep()
         
         twoOptIter = math.floor(r)
-        doubleBridgeIter = 1
+        doubleBridgeIter = 0
         
         for i in range(twoOptIter):
             nest = self.__twoOptInter(nest)
@@ -261,12 +259,15 @@ class CuckooSearch:
             _ = _solr1.route[n1]
             _solr1.route[n1] = _solr2.route[n2]
             _solr2.route[n2] = _
+            self.instance.recalculate_route_demand_cost(_solr1)
+            self.instance.recalculate_route_demand_cost(_solr2)
 
             if _solr1.demand <= self.instance.capacity:
                 if _solr2.demand <= self.instance.capacity:
-                    sol.routes[r1] = _solr1
-                    sol.routes[r2] = _solr2
-                    IsSwapInvalid = False
+                    sol.routes[r1] = deepcopy(_solr1)
+                    sol.routes[r2] = deepcopy(_solr2)
+                    self.instance.recalculate_solution_cost(sol)
+                    break
             
             numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:

@@ -2,11 +2,11 @@ import regex as re
 
 rx_dict = {
     'name': re.compile(r'NAME : (?P<name>.*)'),
-    'comment': re.compile(r'COMMENT : [(]Augerat et al, (Min no of trucks|No of trucks): (?P<minNumVehicles>[0-9]*), (Optimal|Best) value: (?P<optimalValue>[0-9]*)[)]\n'),
+    'comment': re.compile(r'COMMENT : [(]Augerat et al, (Min no of trucks|No of trucks): (?P<minNumVehicles>[0-9]+), (Optimal|Best) value: (?P<optimalValue>[0-9]+)[)]\n'),
     'capacity': re.compile(r'CAPACITY : (?P<capacity>[0-9]+)\n'),
     'node_coord': re.compile(r'NODE_COORD_SECTION'),
     'demand_values': re.compile(r'DEMAND_SECTION'),
-    'values' : re.compile(r'[0-9]* (?P<x>[0-9]+)( )?(?P<y>[0-9]+)?( )?(\\n)?') # test this
+    'values' : re.compile(r'[0-9]+ (?P<x>[0-9]+)( )?(?P<y>[0-9]+)?( )?(\\n)?') # test this
 }
 
 def _parse_line(line):
