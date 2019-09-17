@@ -66,7 +66,8 @@ class CuckooSearch:
             self.nests.sort(key = o.attrgetter('cost'))
 
             # Search, and Evaluate with fraction Pc of Cuckoos of best cuckoos
-            for j in range(math.floor(self.numCuckoos * self.Pc)):
+            PcNum = math.floor(self.numCuckoos * self.Pc)
+            for j in range(PcNum):
                 _levyNest = deepcopy(self.nests[j])
                 self.__performLevyFlights(_levyNest)
                
@@ -79,8 +80,9 @@ class CuckooSearch:
             
             # Abandon a fraction Pa of worse Cuckoos. Generate new random solutions for replacement
             self.nests.sort(key = o.attrgetter('cost'), reverse=True)
+            PaNum = math.floor(self.numCuckoos * self.Pa)
             # Compute probability of each nest to be abandoned except the best nest
-            for j in range(1, math.floor(self.numCuckoos * self.Pa)):
+            for j in range(1, PaNum):
                 del self.nests[0] # Abandon nest
                 sol = self.instance.create_random_solution()
                 self.nests.append(sol)
@@ -179,7 +181,7 @@ class CuckooSearch:
         r = self.__generateLevyStep()
         
         twoOptIter = math.floor(r)
-        doubleBridgeIter = 0
+        doubleBridgeIter = 1
         
         for i in range(twoOptIter):
             nest = self.__twoOptInter(nest)
@@ -311,16 +313,23 @@ class CuckooSearch:
             _ = _solr2.route[n2]
             _solr2.route[n2] = _solr4.route[n4]
             _solr4.route[n4] = _
+            self.instance.recalculate_route_demand_cost(_solr1)
+            self.instance.recalculate_route_demand_cost(_solr2)
+            self.instance.recalculate_route_demand_cost(_solr3)
+            self.instance.recalculate_route_demand_cost(_solr4)
+
 
             if _solr1.demand <= self.instance.capacity:
                 if _solr2.demand <= self.instance.capacity:
                     if _solr3.demand <= self.instance.capacity:
                        if _solr4.demand <= self.instance.capacity:
-                            sol.routes[r1] = _solr1
-                            sol.routes[r2] = _solr2
-                            sol.routes[r3] = _solr3
-                            sol.routes[r4] = _solr4
-                            IsSwapInvalid = False
+                            sol.routes[r1] = deepcopy(_solr1)
+                            sol.routes[r2] = deepcopy(_solr2)
+                            sol.routes[r3] = deepcopy(_solr3)
+                            sol.routes[r4] = deepcopy(_solr4)
+                            self.instance.recalculate_solution_cost(sol)
+                            break
+
             numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
                 break
