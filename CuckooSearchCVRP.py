@@ -53,7 +53,7 @@ class CuckooSearch:
             + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' 
             + str(self.instance.optimalValue) + ' routesGen(gen, min) = ' + str(len(self.nests[0].routes)) 
             + ', ' + str(self.instance.minNumVehicles) + ' numNodes(gen, req) = ' 
-            + str(lenRoute) + ', ' + str(self.instance.dimension))
+            + str(lenRoute+1) + ', ' + str(self.instance.dimension))
 
     def solveInstance(self):
         # Initialize Solutions
@@ -180,9 +180,14 @@ class CuckooSearch:
 
         r = self.__generateLevyStep()
         
-        twoOptIter = math.floor(r)
-        doubleBridgeIter = 1
-        
+        # twoOptIter = math.floor(r)
+        shift1Iter = True
+        twoOptIter = 0
+        doubleBridgeIter = 0
+
+        if shift1Iter:
+            nest = self.__shift1(nest)
+
         for i in range(twoOptIter):
             nest = self.__twoOptInter(nest)
 
@@ -190,18 +195,10 @@ class CuckooSearch:
             nest = self.__doubleBridgeInter(nest)
     #endregion
 
-    #region gaussian, not done
+    #region gaussian implementation
     # def __generateLevyStep(self):
     #     """
-    #     In this implementation, a random value is generated from levy distribution using mantegna's algorithms.
-    #     A levy flight will be generated as follows:
-
-    #     levy step
-    #     0 - 1, 0.2
-    #     1 - 2, 0.4
-    #     2 - 3, 0.6
-    #     3 - 4, 0.8
-    #     4 - 5, 1
+    #     In this implementation, a random value is generated from gaussian distribution
     #     """
     #     # mantegna's algorithm
     #     stepsize = 5
@@ -220,11 +217,8 @@ class CuckooSearch:
 
     #     r = self.__generateLevyStep()
         
-    #     twoOptIter = 0
+    #     twoOptIter = (math.floor(r))
     #     doubleBridgeIter = 0
-    #     if r >= 0 and r <= 0.2:
-    #         twoOptIter = 1
-        
         
     #     for i in range(twoOptIter):
     #         nest = self.__twoOptInter(nest)
@@ -233,13 +227,13 @@ class CuckooSearch:
     #         nest = self.__doubleBridgeInter(nest)
     #endregion
 
+    #region neighborhood structures
     def __twoOptInter(self, sol): 
         # takes solution as input
         # gets 2 routes randomly
         # Select random node from each
         # Swap nodes, until valid route is generated
         numRoutes = len(sol.routes) # sol.routes - list
-
         r = list(range(numRoutes))
         
         # Perform Swap
@@ -276,7 +270,6 @@ class CuckooSearch:
                 break
 
         return sol
-
     def __doubleBridgeInter(self, sol):
         # takes solution as input
         # gets 4 routes randomly
@@ -335,7 +328,36 @@ class CuckooSearch:
                 break
 
         return sol
+    def __shift1(self,sol):
+        # takes solution as input
+        # select route randomly
+        # select random node from that route, cycle through all other routes
+        # if insert is feasible, take  
+        # does not consider if new route > old route       
+        numRoutes = len(sol.routes) # sol.routes - list
+        # select random route and randome node
+        r = random.randrange(0, numRoutes)
+        n = random.randrange(1, len(sol.routes[r].route) - 1)
+        rNode = sol.routes[r].route[n]
+        rNodeDemand = self.instance.listDemand[rNode]
+        for i, route in enumerate(sol.routes):
+            if i != r and route.demand + rNodeDemand < self.instance.capacity:
+                route.route = route.route[:-1]
+                route.route.append(rNode)
+                route.route.append(0)
+                del sol.routes[r].route[n]
+                self.instance.recalculate_route_demand_cost(route)
 
+                # if there are no more nodes in route r
+                if len(sol.routes[r].route) <= 2:
+                    del sol.routes[r]
+                else:
+                    self.instance.recalculate_route_demand_cost(sol.routes[r])
+                return self.instance.recalculate_solution_cost(sol)
+                # recalculate both after
+
+                
+    #endregion
 
     def __repr__(self):
         
