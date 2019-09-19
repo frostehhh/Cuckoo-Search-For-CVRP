@@ -43,13 +43,13 @@ class CuckooSearch:
         start = timer()
         self.solveInstance()
         end = timer()
-        time = str("{0:.2f}".format(end - start)) 
+        self.time = str("{0:.2f}".format(end - start)) 
         
         lenRoute = 0
         for route in self.nests[0].routes:
             lenRoute += len(route.route) - 2
 
-        print('Dataset: ' + self.instance.fileName + ', Run time: ' + time 
+        print('Dataset: ' + self.instance.fileName + ', Run time: ' + self.time 
             + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' 
             + str(self.instance.optimalValue) + ' routesGen(gen, min) = ' + str(len(self.nests[0].routes)) 
             + ', ' + str(self.instance.minNumVehicles) + ' numNodes(gen, req) = ' 
@@ -104,36 +104,51 @@ class CuckooSearch:
         u = np.random.normal(loc=0,scale=sigma)
         v = np.random.normal(loc=0,scale=1)
         steplength = u/ math.pow(abs(v),1/beta)
-        step = stepsize*steplength
-        step = abs(step)
         
-        return step
+        return steplength
 
     def __performLevyFlights(self, nest):
         # Generate random value x from levy 
         # According to randomly generated value, perform 2-opt x time or double-bridge
+        
+        #region 2-opt and double-bridge
         r = self.__generateLevyStep()
         
         twoOptIter = 0
-        doubleBridgeIter = 0
-        shift1Iter = 0
-        upperBound = 6
+        doubleBridgeIter = 1
 
-        choice = random.choice([1,2])
-        # choice = 1
-        if choice == 1: 
-            twoOptIter = math.ceil(r)
-            for i in range(twoOptIter):
-                self.__twoOptInter(nest)
-        else:
-            shift1Iter = math.ceil(r)
-            for i in range(shift1Iter):
-                self.__shift1(nest)
-
+        twoOptIter = math.ceil(r)
+        for i in range(twoOptIter):
+            self.__twoOptInter(nest)
 
         for i in range(doubleBridgeIter):
             self.__doubleBridgeInter(nest)
+        #endregion
+        
+        #region 2-opt and shift-1-0
+        # r = self.__generateLevyStep()
+        
+        # twoOptIter = 0
+        # doubleBridgeIter = 0
+        # shift1Iter = 0
+        # upperBound = 6
 
+
+        # choice = random.choice([1,2])
+        # # choice = 1
+        # if choice == 1: 
+        #     twoOptIter = math.ceil(r)
+        #     for i in range(twoOptIter):
+        #         self.__twoOptInter(nest)
+
+        # else:
+        #     shift1Iter = math.ceil(r)
+        #     for i in range(shift1Iter):
+        #         self.__shift1(nest)
+
+        # for i in range(doubleBridgeIter):
+        #     self.__doubleBridgeInter(nest)
+        #endregion
 
     #endregion
     #region gaussian implementation
@@ -298,6 +313,9 @@ class CuckooSearch:
         while IsSwapInvalid:
 
             # re-shuffle routes to swap
+            if len(r) < 4:
+                IsSwapInvalid = True
+                break
             random.shuffle(r)
             r1, r2, r3, r4 = r[0], r[1], r[2], r[3]
             
@@ -375,6 +393,16 @@ class CuckooSearch:
                 
     #endregion
 
+    def readData(self):
+        data = {
+            "Name" : self.instance.fileName,
+            "Best Solution Cost" : self.nests[0].cost,
+            "Optimal Value" : self.instance.optimalValue,
+            "Run Time" : self.time,
+            "Solution" : self.nests
+        }
+        return data
+
     def __repr__(self):
         
         # return filename, 
@@ -382,7 +410,7 @@ class CuckooSearch:
             "Name" : self.instance.fileName,
             "Best Solution Cost" : self.nests[0].cost,
             "Optimal Value" : self.instance.optimalValue,
-            "Run Time" : 'test',
+            "Run Time" : self.time,
             "Solution" : self.nests
         }
         return str(string)
