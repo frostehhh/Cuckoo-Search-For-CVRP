@@ -99,7 +99,6 @@ class CuckooSearch:
         """
         # mantegna's algorithm
         beta = 1
-        stepsize = 1
         sigma = ((gamma(1 + beta)) * math.sin(math.pi*beta/2)) / ( beta * gamma((1+beta)/2) * math.pow(2,(beta-1)/2) )
         u = np.random.normal(loc=0,scale=sigma)
         v = np.random.normal(loc=0,scale=1)
@@ -139,7 +138,6 @@ class CuckooSearch:
             twoOptIter = math.ceil(r)
             for i in range(twoOptIter):
                 self.__twoOptInter(nest)
-
         else:
             shift1Iter = math.ceil(r)
             for i in range(shift1Iter):
