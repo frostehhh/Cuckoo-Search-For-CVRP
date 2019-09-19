@@ -112,42 +112,41 @@ class CuckooSearch:
         # According to randomly generated value, perform 2-opt x time or double-bridge
         
         #region 2-opt and double-bridge
-        r = self.__generateLevyStep()
-        
-        twoOptIter = 0
-        doubleBridgeIter = 1
-
-        twoOptIter = math.ceil(r)
-        for i in range(twoOptIter):
-            self.__twoOptInter(nest)
-
-        for i in range(doubleBridgeIter):
-            self.__doubleBridgeInter(nest)
-        #endregion
-        
-        #region 2-opt and shift-1-0
         # r = self.__generateLevyStep()
         
         # twoOptIter = 0
-        # doubleBridgeIter = 0
-        # shift1Iter = 0
-        # upperBound = 6
+        # doubleBridgeIter = 1
 
-
-        # choice = random.choice([1,2])
-        # # choice = 1
-        # if choice == 1: 
-        #     twoOptIter = math.ceil(r)
-        #     for i in range(twoOptIter):
-        #         self.__twoOptInter(nest)
-
-        # else:
-        #     shift1Iter = math.ceil(r)
-        #     for i in range(shift1Iter):
-        #         self.__shift1(nest)
+        # twoOptIter = math.ceil(r)
+        # for i in range(twoOptIter):
+        #     self.__twoOptInter(nest)
 
         # for i in range(doubleBridgeIter):
         #     self.__doubleBridgeInter(nest)
+        #endregion
+        
+        #region 2-opt and shift-1-0
+        r = self.__generateLevyStep()
+        
+        twoOptIter = 0
+        doubleBridgeIter = 0
+        shift1Iter = 0
+        upperBound = 6
+
+
+        choice = random.choice([1,2])
+        if choice == 1: 
+            twoOptIter = math.ceil(r)
+            for i in range(twoOptIter):
+                self.__twoOptInter(nest)
+
+        else:
+            shift1Iter = math.ceil(r)
+            for i in range(shift1Iter):
+                self.__shift1(nest)
+
+        for i in range(doubleBridgeIter):
+            self.__doubleBridgeInter(nest)
         #endregion
 
     #endregion
