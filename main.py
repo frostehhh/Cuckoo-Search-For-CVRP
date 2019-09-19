@@ -11,7 +11,7 @@ from CuckooSearchCVRP import CuckooSearch
 numNests = 15
 Pa = 0.25 # Fraction of worse solutions to be replaced
 Pc = 1 # Fraction of cuckoos performing Levy Flights
-maxGenerations = 1 # maximum number of iterations
+maxGenerations = 1000# maximum number of iterations
 stopCriterion = maxGenerations # attempt limit of successive iterations
 
 #region Load Datasets
@@ -54,11 +54,12 @@ def saveResultsToCsv(df, path):
                         _ = '0' + str(fileNum)
                 else:
                         _ = str(fileNum)
-                if os.path.exists(path + 'results' + _ + '.csv'):
+                if os.path.exists(path + 'results' + path[8] + _ + '.csv'):
                         fileNum += 1
                         continue
                 else:
-                        df.to_csv(path + 'results' + _ + '.csv')
+                        df.to_csv(path + 'results' + path[8] + _ + '.csv')
+                        print('Saved ' + 'results' + path[8] + _ + '.csv')
                         break
 
 
