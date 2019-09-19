@@ -90,6 +90,83 @@ class CuckooSearch:
             # Sort from best to worst and keep best solution
             self.nests.sort(key = o.attrgetter('cost'))
     
+    
+    #region original levy flight implementation, levy step = number of 2-opt
+    def __generateLevyStep(self):
+        """
+        In this implementation, a random value is generated from levy distribution using mantegna's algorithms.
+
+        """
+        # mantegna's algorithm
+        beta = 1
+        stepsize = 1
+        sigma = ((gamma(1 + beta)) * math.sin(math.pi*beta/2)) / ( beta * gamma((1+beta)/2) * math.pow(2,(beta-1)/2) )
+        u = np.random.normal(loc=0,scale=sigma)
+        v = np.random.normal(loc=0,scale=1)
+        steplength = u/ math.pow(abs(v),1/beta)
+        step = stepsize*steplength
+        step = abs(step)
+        
+        return step
+
+    def __performLevyFlights(self, nest):
+        # Generate random value x from levy 
+        # According to randomly generated value, perform 2-opt x time or double-bridge
+        r = self.__generateLevyStep()
+        
+        twoOptIter = 0
+        doubleBridgeIter = 0
+        shift1Iter = 0
+        upperBound = 6
+
+        choice = random.choice([1,2])
+        # choice = 1
+        if choice == 1: 
+            twoOptIter = math.ceil(r)
+            for i in range(twoOptIter):
+                self.__twoOptInter(nest)
+        else:
+            shift1Iter = math.ceil(r)
+            for i in range(shift1Iter):
+                self.__shift1(nest)
+
+
+        for i in range(doubleBridgeIter):
+            self.__doubleBridgeInter(nest)
+
+
+    #endregion
+    #region gaussian implementation
+    # def __generateLevyStep(self):
+    #     """
+    #     In this implementation, a random value is generated from gaussian distribution
+    #     """
+    #     # mantegna's algorithm
+    #     stepsize = 5
+    #     steplength = np.random.normal(loc=0,scale=1)
+    #     step = stepsize*steplength
+    #     step = abs(step)
+        
+    #     return step
+
+    # def __performLevyFlights(self, nest):
+    #     # Generate random value x from levy 
+    #     # According to randomly generated value, perform 2-opt x time or double-bridge
+
+    #     # # temporary random num gen
+    #     # r = random.random()
+
+    #     r = self.__generateLevyStep()
+        
+    #     twoOptIter = (math.ceil(r))
+    #     doubleBridgeIter = 0
+        
+    #     for i in range(twoOptIter):
+    #         nest = self.__twoOptInter(nest)
+
+    #     for i in range(doubleBridgeIter):
+    #         nest = self.__doubleBridgeInter(nest)
+    #endregion
     #region first implementation, range 0-5 of levy distrib considered. xiao
     # def __generateLevyStep(self):
     #     """
@@ -156,77 +233,6 @@ class CuckooSearch:
     #         nest = self.__doubleBridgeInter(nest)
     #endregion
 
-    #region original levy flight implementation, levy step = number of 2-opt
-    def __generateLevyStep(self):
-        """
-        In this implementation, a random value is generated from levy distribution using mantegna's algorithms.
-
-        """
-        # mantegna's algorithm
-        beta = 1
-        stepsize = 1
-        sigma = ((gamma(1 + beta)) * math.sin(math.pi*beta/2)) / ( beta * gamma((1+beta)/2) * math.pow(2,(beta-1)/2) )
-        u = np.random.normal(loc=0,scale=sigma)
-        v = np.random.normal(loc=0,scale=1)
-        steplength = u/ math.pow(abs(v),1/beta)
-        step = stepsize*steplength
-        step = abs(step)
-        
-        return step
-
-    def __performLevyFlights(self, nest):
-        # Generate random value x from levy 
-        # According to randomly generated value, perform 2-opt x time or double-bridge
-
-        r = self.__generateLevyStep()
-        
-        # twoOptIter = math.floor(r)
-        shift1Iter = True
-        twoOptIter = 0
-        doubleBridgeIter = 0
-
-        if shift1Iter:
-            nest = self.__shift1(nest)
-
-        for i in range(twoOptIter):
-            nest = self.__twoOptInter(nest)
-
-        for i in range(doubleBridgeIter):
-            nest = self.__doubleBridgeInter(nest)
-    #endregion
-
-    #region gaussian implementation
-    # def __generateLevyStep(self):
-    #     """
-    #     In this implementation, a random value is generated from gaussian distribution
-    #     """
-    #     # mantegna's algorithm
-    #     stepsize = 5
-    #     steplength = np.random.normal(loc=0,scale=1)
-    #     step = stepsize*steplength
-    #     step = abs(step)
-        
-    #     return step
-
-    # def __performLevyFlights(self, nest):
-    #     # Generate random value x from levy 
-    #     # According to randomly generated value, perform 2-opt x time or double-bridge
-
-    #     # # temporary random num gen
-    #     # r = random.random()
-
-    #     r = self.__generateLevyStep()
-        
-    #     twoOptIter = (math.floor(r))
-    #     doubleBridgeIter = 0
-        
-    #     for i in range(twoOptIter):
-    #         nest = self.__twoOptInter(nest)
-
-    #     for i in range(doubleBridgeIter):
-    #         nest = self.__doubleBridgeInter(nest)
-    #endregion
-
     #region neighborhood structures
     def __twoOptInter(self, sol): 
         # takes solution as input
@@ -249,9 +255,16 @@ class CuckooSearch:
             _solr2 = deepcopy(sol.routes[r2])
 
             # Randomly select nodes to swap from each route
-            n1 = random.randrange(1, len(_solr1.route) - 1) # start with 1 to disregard depot
-            n2 = random.randrange(1, len(_solr2.route) - 1)
-            
+            # start with 1 to disregard depot
+            try:
+                n1 = random.randrange(1, len(_solr1.route) - 1) 
+            except ValueError:
+                n1 =  1
+            try:
+                n2 = random.randrange(1, len(_solr2.route) - 1)
+            except ValueError:
+                n2 = 1
+
             _ = _solr1.route[n1]
             _solr1.route[n1] = _solr2.route[n2]
             _solr2.route[n2] = _
@@ -332,12 +345,15 @@ class CuckooSearch:
         # takes solution as input
         # select route randomly
         # select random node from that route, cycle through all other routes
-        # if insert is feasible, take  
-        # does not consider if new route > old route       
+        # if insert is feasible, take      
         numRoutes = len(sol.routes) # sol.routes - list
-        # select random route and randome node
+        # select random route and random node
         r = random.randrange(0, numRoutes)
-        n = random.randrange(1, len(sol.routes[r].route) - 1)
+        try:
+            n = random.randrange(1, len(sol.routes[r].route) - 1)
+        except ValueError:
+            n = 1
+
         rNode = sol.routes[r].route[n]
         rNodeDemand = self.instance.listDemand[rNode]
         for i, route in enumerate(sol.routes):
@@ -354,8 +370,8 @@ class CuckooSearch:
                 else:
                     self.instance.recalculate_route_demand_cost(sol.routes[r])
                 return self.instance.recalculate_solution_cost(sol)
-                # recalculate both after
-
+        # no change performed
+        return sol
                 
     #endregion
 
