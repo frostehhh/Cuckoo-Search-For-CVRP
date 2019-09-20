@@ -116,6 +116,7 @@ class CVRPInfo():
     #     capacity constraints.
     #     """
     #     unserviced = [i for i in range(1, self.dimension)]
+    #     random.shuffle(unserviced)
     #     routes = [] # list of all routes
     #     cur_route = [0] # start with depot node
     #     route_demand = 0
