@@ -123,30 +123,39 @@ class CuckooSearch:
         # for i in range(doubleBridgeIter):
         #     self.__doubleBridgeInter(nest)
         #endregion
-        
         #region 2-opt and shift-1-0
+        # r = self.__generateLevyStep()
+        
+        # twoOptIter = 0
+        # doubleBridgeIter = 0
+        # shift1Iter = 0
+        # upperBound = 6
+
+
+        # choice = random.choice([1,2])
+        # if choice == 1: 
+        #     twoOptIter = math.ceil(r)
+        #     for i in range(twoOptIter):
+        #         self.__twoOptInter(nest)
+        # else:
+        #     shift1Iter = math.ceil(r)
+        #     for i in range(shift1Iter):
+        #         self.__shift1(nest)
+
+        # for i in range(doubleBridgeIter):
+        #     self.__doubleBridgeInter(nest)
+        #endregion
+        #region testing shift-2-0
         r = self.__generateLevyStep()
         
-        twoOptIter = 0
-        doubleBridgeIter = 0
-        shift1Iter = 0
+        shift2Iter = 10
         upperBound = 6
 
+        shift2Iter = math.ceil(r)
+        for i in range(shift2Iter):
+            self.__shift2(nest)
 
-        choice = random.choice([1,2])
-        if choice == 1: 
-            twoOptIter = math.ceil(r)
-            for i in range(twoOptIter):
-                self.__twoOptInter(nest)
-        else:
-            shift1Iter = math.ceil(r)
-            for i in range(shift1Iter):
-                self.__shift1(nest)
-
-        for i in range(doubleBridgeIter):
-            self.__doubleBridgeInter(nest)
         #endregion
-
     #endregion
     #region gaussian implementation
     # def __generateLevyStep(self):
@@ -387,7 +396,39 @@ class CuckooSearch:
                 return self.instance.recalculate_solution_cost(sol)
         # no change performed
         return sol
-                
+
+    # not done
+    def __shift2(self,sol):
+        # takes solution as input
+        # select route randomly
+        # select random node from that route, cycle through all other routes
+        # if insert is feasible, take      
+        numRoutes = len(sol.routes) # sol.routes - list
+        # select random route and random node
+        r = random.randrange(0, numRoutes)
+        if len(sol.routes[r].route) >= 4:
+            n = random.randrange(1, len(sol.routes[r].route) - 2)
+            rNode = [sol.routes[r].route[n], sol.routes[r].route[n+1]]
+            rNodeDemand = [self.instance.listDemand[rNode[0]], self.instance.listDemand[rNode[1]]]
+            for i, route in enumerate(sol.routes):
+                if i != r and route.demand + rNodeDemand[0] + rNodeDemand[1] < self.instance.capacity:
+                    route.route = route.route[:-1]
+                    route.route.append(rNode[0])
+                    route.route.append(rNode[1])
+                    route.route.append(0)
+                    del sol.routes[r].route[n]
+                    del sol.routes[r].route[n]
+                    self.instance.recalculate_route_demand_cost(route)
+
+                    # if there are no more nodes in route r
+                    if len(sol.routes[r].route) <= 2:
+                        del sol.routes[r]
+                    else:
+                        self.instance.recalculate_route_demand_cost(sol.routes[r])
+                    return self.instance.recalculate_solution_cost(sol)
+            # no change performed
+            return sol   
+        return sol
     #endregion
 
     def readData(self):
