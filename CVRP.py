@@ -63,6 +63,11 @@ class CVRPInfo():
         route = Route(cost=cost, demand=demand, is_valid=is_valid, route=node_list)
         return route
 
+    def recalculate_solution_customer_order(self,sol):
+        for route in sol.routes:
+            for node in route.route[1:-2]:
+                sol.customerOrder.append(node)
+
     def recalculate_route_demand_cost(self, route):
         cost = 0
         demand = 0
@@ -125,8 +130,13 @@ class CVRPInfo():
 
         feasibleRoutes = self.__generateAllFeasibleRoutes(customerNodes)
         optimalRoutes = self.__findOptimalSplit(feasibleRoutes, customerNodes)
-
-        return self.create_solution(optimalRoutes)
+        
+        return optimalRoutes
+        
+    def recreate_solution_from_customerOrder(self, sol):
+        feasibleRoutes = self.__generateAllFeasibleRoutes(sol.customerOrder)
+        optimalRoutes = self.__findOptimalSplit(feasibleRoutes, sol.customerOrder)
+        return optimalRoutes
 
     def __generateAllFeasibleRoutes(self, customerNodes):
         feasibleRoutes = [[] for i in range(len(customerNodes))]
@@ -151,144 +161,43 @@ class CVRPInfo():
         solutionsList = [[0->1->0, 0->2->3->0]
                         ,[0->1->2->0, 0->3->0]]
         """
-        prevNode = 0
         # solutionList[i] should contain best path from 0 to i
         solutionList = []
         solutionListToAppend = []
-        solutionListToDelete = []
 
-        for i, routeList in enumerate(feasibleRoutes):
+
+        # Initialize solutionList
+        for route in feasibleRoutes[0]:
+            sol = self.create_solution([route])
+            solutionList.append(sol)
+
+        # for i, routeList in enumerate(feasibleRoutes):
+        for i in range(1, len(customerNodes)):
             # check where the routes in the current routeList can be appended
-            try:
-                for solution in solutionList:
-                    if solution == 0:
-                        continue
-                    # solutionListToDelete.append(solution)
-                    # create solutions for the solution
-                    for route in routeList:
-                        _solution = deepcopy(solution)
-                        _solution.routes.append(route)
-                        solutionListToAppend.append(_solution)
-                # append solutions to solutionList[i]
-                for solution in solutionListToAppend:
-                    endNode = solution.routes[-1].route[-2]
-                    endNodeIdx = customerNodes.index(endNode)
-                    try:
-                        self.recalculate_solution_cost(solution)
-                        if solution.cost < solutionList[endNodeIdx].cost:
-                            solutionList[endNodeIdx] = solution
-                    # if the index does not exist, add
-                    except IndexError:
-                        solutionList.append(solution)
-                solutionList[i-1] = 0
-                solutionListToAppend = []
-                    # delete all unnecessary solutions
-                    # solutionList = [sol for sol in solutionList if sol not 
-                    #                 in solutionListToDelete]
-                    # solutionListToAppend = []
-                    # solutionListToDelete = []
-            # if solutionList is empty
-            except IndexError:
-                if solutionList == []:
-                    for route in routeList:
-                        sol = self.create_solution([route])
-                        solutionList.append(sol)
-                        
-            # prevNode = customerNodes[i]
-            # compute all routes to add the the given _solNum
-            
+            # try:
+            # for solution in solutionList[i-1:]:
+            #     # create solutions for the solution
+            for route in feasibleRoutes[i]:
+                _solution = deepcopy(solutionList[i-1])
+                _solution.routes.append(route)
+                self.recalculate_solution_cost(_solution)
+                solutionListToAppend.append(_solution)
+            # append solutions to solutionList[i]
+            for solution in solutionListToAppend:
+                endNode = solution.routes[-1].route[-2]
+                endNode = customerNodes.index(endNode) 
+                try:
+                    if solution.cost < solutionList[endNode].cost:
+                        solutionList[endNode] = solution
+                # if the index does not exist, add
+                except IndexError:
+                    solutionList.append(solution)
+            # del solutionList[i-1]
+            solutionListToAppend = []
+
+        solutionList[-1].customerOrder = customerNodes
         return solutionList[-1]
 
-    #endregion
-
-    #region random solution, add to route with lowest capacity
-    # def create_random_solution(self):
-    #     unserviced = [i for i in range(1, self.dimension)]
-    #     random.shuffle(unserviced)
-    #     routes = [[0] for i in range(self.minNumVehicles)] #list of all routes
-        
-    #     route_demand = [0 for i in range(self.minNumVehicles)]
-        
-    #     debugiterationcount = 0
-    #     # iterate through each route
-    #     # randomly select an unserviced node to add to that current route
-    #     while unserviced:
-    #         print('debugiterationcount: ' + str(debugiterationcount))
-    #         node = unserviced[0]
-    #         sortedRoutes = [route for _,route in sorted(zip(route_demand,routes))]
-    #         routes = sortedRoutes
-    #         route_demand.sort()
-
-    #         pass
-    #         # If the route can still accomodate the node
-    #         # cycle through all routes
-    #         for i, route in enumerate(routes):
-    #             if route_demand[i] + self.listDemand[node] <= self.capacity:
-    #                 route += [node]
-    #                 route_demand[i] += self.listDemand[node]
-    #                 del unserviced[0]
-    #                 break
-    #         else:
-    #             print('no feasible solution found sa create_random_solution')
-    #             for route in routes:
-    #                 pass
-    #                 # shift 1 node from a route to another route to accomodate 
-    #                 # the node that cannot be inserted
-               
-    #         debugiterationcount += 1 
-        
-    #     final_routes = []
-    #     for i in range(len(routes)):
-    #         final_routes += [self.create_route(routes[i] + [0])]
-    #     return self.create_solution(final_routes)
-    #endregion
-
-    #region create random solution, add 1 node per route in each iteration, cycle through routes.
-    # def create_random_solution(self):
-    #     unserviced = [i for i in range(1, self.dimension)]
-    #     random.shuffle(unserviced)
-    #     free_routes = [[0] for i in range(self.minNumVehicles)] #list of all routes
-    #     final_routes = []
-        
-    #     free_route_demand = [0 for i in range(self.minNumVehicles)]
-    #     final_route_demand = []
-
-    #     free_route_count = self.minNumVehicles
-    #     currRoute = 0
-        
-    #     debugiterationcount = 0
-    #     # iterate through each route
-    #     # randomly select an unserviced node to add to that current route
-    #     while unserviced:
-    #         print('debugiterationcount: ' + str(debugiterationcount))
-    #         node = unserviced[0]
-    #         # If the route can still accomodate the node
-    #         if free_route_demand[currRoute] + self.listDemand[node] <= self.capacity:
-    #             free_routes[currRoute] += [node]
-    #             free_route_demand[currRoute] += self.listDemand[node]
-    #             currRoute += 1
-    #             if currRoute == free_route_count:
-    #                 currRoute = 0
-    #             del unserviced[0]
-    #         # If the route cannot accomodate the node
-    #         else: 
-    #             currRoute += 1
-    #             if currRoute == free_route_count:
-    #                 currRoute = 0
-    #             # final_routes += [self.create_route(free_routes[currRoute] + [0])]
-    #             # final_route_demand += [free_route_demand[currRoute]]
-    #             # del free_routes[currRoute]
-    #             # del free_route_demand[currRoute]
-    #             # free_route_count -= 1
-    #             # if currRoute >= free_route_count:
-    #             #     currRoute = 0
-    #         debugiterationcount += 1 
-    #     if free_route_count > 0:
-    #         for i in range(free_route_count):
-    #             final_routes += [self.create_route(free_routes[i] + [0])]
-    #             final_route_demand += [free_route_demand[i]]
-
-    #     return self.create_solution(final_routes)
     #endregion
 
 
@@ -330,9 +239,10 @@ class CVRPInfo():
     def evaluate_solution(self, sol):
         pass
 class Solution:
-    def __init__(self, routes=[], cost=0, is_valid=False, demand=0):
+    def __init__(self, routes=[], customerOrder = [], cost=0, is_valid=False, demand=0):
         self.is_valid = is_valid
         self.routes = routes
+        self.customerOrder = customerOrder
         self.cost = cost
         self.demand = demand
         self.penalty = 0

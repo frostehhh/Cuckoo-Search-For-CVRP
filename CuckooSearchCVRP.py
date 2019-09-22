@@ -66,26 +66,26 @@ class CuckooSearch:
             self.nests.sort(key = o.attrgetter('cost'))
 
             # Search, and Evaluate with fraction Pc of Cuckoos of best cuckoos
-            PcNum = math.floor(self.numCuckoos * self.Pc)
-            for j in range(PcNum):
-                _levyNest = deepcopy(self.nests[j])
-                self.__performLevyFlights(_levyNest)
+            # PcNum = math.floor(self.numCuckoos * self.Pc)
+            # for j in range(PcNum):
+            #     _levyNest = deepcopy(self.nests[j])
+            #     self.__performLevyFlights(_levyNest)
                
-                # Randomly select a nest to compare with
-                _nestCompare = random.randrange(1, self.numCuckoos)
+            #     # Randomly select a nest to compare with
+            #     _nestCompare = random.randrange(1, self.numCuckoos)
 
-                # If the generated solution is better than a randomly selected nest
-                if _levyNest.cost < self.nests[_nestCompare].cost:
-                    self.nests[_nestCompare] = deepcopy(_levyNest)
+            #     # If the generated solution is better than a randomly selected nest
+            #     if _levyNest.cost < self.nests[_nestCompare].cost:
+            #         self.nests[_nestCompare] = deepcopy(_levyNest)
             
             # Abandon a fraction Pa of worse Cuckoos. Generate new random solutions for replacement
-            self.nests.sort(key = o.attrgetter('cost'), reverse=True)
-            PaNum = math.floor(self.numCuckoos * self.Pa)
-            # Compute probability of each nest to be abandoned except the best nest
-            for j in range(1, PaNum):
-                del self.nests[0] # Abandon nest
-                sol = self.instance.create_random_solution()
-                self.nests.append(sol)
+            # self.nests.sort(key = o.attrgetter('cost'), reverse=True)
+            # PaNum = math.floor(self.numCuckoos * self.Pa)
+            # # Compute probability of each nest to be abandoned except the best nest
+            # for j in range(1, PaNum):
+            #     del self.nests[0] # Abandon nest
+            #     sol = self.instance.create_random_solution()
+            #     self.nests.append(sol)
 
             # Sort from best to worst and keep best solution
             self.nests.sort(key = o.attrgetter('cost'))
@@ -109,10 +109,8 @@ class CuckooSearch:
     def __performLevyFlights(self, nest):
         # Generate random value x from levy 
         # According to randomly generated value, perform 2-opt x time or double-bridge
-        
+        r = self.__generateLevyStep()
         #region 2-opt and double-bridge
-        # r = self.__generateLevyStep()
-        
         # twoOptIter = 0
         # doubleBridgeIter = 1
 
@@ -123,9 +121,7 @@ class CuckooSearch:
         # for i in range(doubleBridgeIter):
         #     self.__doubleBridgeInter(nest)
         #endregion
-        #region 2-opt and shift-1-0
-        # r = self.__generateLevyStep()
-        
+        #region 2-opt and shift-1-0        
         # twoOptIter = 0
         # doubleBridgeIter = 0
         # shift1Iter = 0
@@ -146,15 +142,19 @@ class CuckooSearch:
         #     self.__doubleBridgeInter(nest)
         #endregion
         #region testing shift-2-0
-        r = self.__generateLevyStep()
-        
-        shift2Iter = 10
-        upperBound = 6
+        # shift2Iter = 10
+        # upperBound = 6
 
-        shift2Iter = math.ceil(r)
-        for i in range(shift2Iter):
-            self.__shift2(nest)
-
+        # shift2Iter = math.ceil(r)
+        # for i in range(shift2Iter):
+        #     self.__shift2(nest)
+        #endregion
+        #region 2-opt intra
+        twoOptIntraIter = 0
+        twoOptIntraIter = math.ceil(r)
+        if twoOptIntraIter > 5:
+            twoOptIntraIter = 5
+        self.__twoOptIntra(nest, twoOptIntraIter)
         #endregion
     #endregion
     #region gaussian implementation
@@ -280,10 +280,12 @@ class CuckooSearch:
             try:
                 n1 = random.randrange(1, len(_solr1.route) - 1) 
             except ValueError:
+                # if there is only 1 customer
                 n1 =  1
             try:
                 n2 = random.randrange(1, len(_solr2.route) - 1)
             except ValueError:
+                # if there is only 1 customer
                 n2 = 1
 
             _ = _solr1.route[n1]
@@ -429,6 +431,16 @@ class CuckooSearch:
             # no change performed
             return sol   
         return sol
+    def __twoOptIntra(self, sol, iter):
+        # perform 2-opt on sol.customerNodes for TSP gen
+        if len(sol.customerOrder) > 2:
+            for i in range(iter):
+                customerOrderSize = range(len(sol.customerOrder))
+                n = random.choices(customerOrderSize, k = 2)
+
+                sol.customerOrder[n[1]], sol.customerOrder[n[0]] = sol.customerOrder[n[0]], sol.customerOrder[n[1]]
+
+            sol = self.instance.recreate_solution_from_customerOrder(sol)
     #endregion
 
     def readData(self):
