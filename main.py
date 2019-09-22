@@ -20,13 +20,15 @@ DataSetB = os.listdir(DataSetBPath) # list of file names of benchmark instances 
 DataSetP = os.listdir(DataSetPPath) # list of file names of benchmark instances from Set P
 #end region
 
+ResultsSetAPath = 'finalresults/A-VRP/'
+ResultsSetBPath = 'finalresults/B-VRP/'
+ResultsSetPPath = 'finalresults/P-VRP/'
+
 ResultsSetAPath = 'results/A-VRP/'
 ResultsSetBPath = 'results/B-VRP/'
 ResultsSetPPath = 'results/P-VRP/'
 
-ResultsSetAPath = 'finalresults/A-VRP/'
-ResultsSetBPath = 'finalresults/B-VRP/'
-ResultsSetPPath = 'finalresults/P-VRP/'
+
 
 #region definitions
 def initializeInstanceData():
@@ -55,16 +57,11 @@ def initializeExperimentData(name=None, optVal=None, minSolCost=None,
                 'Std of Solution Cost':[stdSolCost],
                 'Avg Run Time':[avgRunTime]
                 }  
-
-
-       
-
 def appendRowToInstanceDf(df, row):
         df['Name'] += [row['Name']]
         df['Best Solution Cost'] += [row['Best Solution Cost']]
         df['Optimal Value'] += [row['Optimal Value']]
         df['Run Time'] += [row['Run Time']]
-
 def appendRowToExperimentDf(df, row):
         df['Name'] += row['Name']
         df['Optimal Value'] += row['Optimal Value']
@@ -73,7 +70,6 @@ def appendRowToExperimentDf(df, row):
         df['Avg Solution Cost'] += row['Avg Solution Cost']
         df['Std of Solution Cost'] += row['Std of Solution Cost']
         df['Avg Run Time'] += row['Avg Run Time']
-
 def calculateInstanceResults(instanceData):
         minSolCost = math.inf
         maxSolCost = 0
@@ -100,7 +96,6 @@ def calculateInstanceResults(instanceData):
                 ,minSolCost, maxSolCost, avgSolCost, stdSolCost, avgRunTime)
         print()
         return data
-
 def saveResultsToCsv(df, path):
         df = pd.DataFrame(df)
         # write to results.csv
@@ -139,53 +134,53 @@ def saveResultsToCsv(df, path):
 numNests = 15
 Pa = 0.25 # Fraction of worse solutions to be replaced
 Pc = 0.6 # Fraction of cuckoos performing Levy Flights
-maxGenerations = 1# maximum number of iterations
+maxGenerations = 1000# maximum number of iterations
 stopCriterion = maxGenerations # attempt limit of successive iterations
 
 print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' + str(Pc) +
 ' maxGenerations: ' + str(maxGenerations) + ' stopCriterion = ' + str(stopCriterion))
 
 #region iterate once
-# data = []
-# data = initializeData()
-# for dataset in DataSetA:
-#         CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         appendRowToDf(data, solver.readData())
-# saveResultsToCsv(data, ResultsSetAPath)
+data = []
+data = initializeInstanceData()
+for dataset in DataSetA:
+        CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
+        solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+        solver.solveInstance()
+        appendRowToInstanceDf(data, solver.readData())
+saveResultsToCsv(data, ResultsSetAPath)
 
-# data = initializeData()
-# for dataset in DataSetB:
-#         CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         appendRowToDf(data, solver.readData())
-# saveResultsToCsv(data, ResultsSetBPath)
+data = initializeInstanceData()
+for dataset in DataSetB:
+        CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
+        solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+        solver.solveInstance()
+        appendRowToInstanceDf(data, solver.readData())
+saveResultsToCsv(data, ResultsSetBPath)
 
-# data = initializeData()
-# for dataset in DataSetP:
-#         CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         appendRowToDf(data, solver.readData())
-# saveResultsToCsv(data, ResultsSetPPath)
+data = initializeInstanceData()
+for dataset in DataSetP:
+        CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
+        solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+        solver.solveInstance()
+        appendRowToInstanceDf(data, solver.readData())
+saveResultsToCsv(data, ResultsSetPPath)
 #endregion
 #region iterate 30 times
-numIter = 30
+# numIter = 30
 
-experimentData = initializeExperimentData()
-instanceData = initializeInstanceData()
-for dataset in DataSetA:
-        instanceData = initializeInstanceData()
-        for i in range(numIter):
-                CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-                solver.solveInstance()
-                appendRowToInstanceDf(instanceData, solver.readData())
-        row = calculateInstanceResults(instanceData)
-        appendRowToExperimentDf(experimentData, row)
-saveResultsToCsv(experimentData, ResultsSetAPath)
+# experimentData = initializeExperimentData()
+# instanceData = initializeInstanceData()
+# for dataset in DataSetA:
+#         instanceData = initializeInstanceData()
+#         for i in range(numIter):
+#                 CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
+#                 solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+#                 solver.solveInstance()
+#                 appendRowToInstanceDf(instanceData, solver.readData())
+#         row = calculateInstanceResults(instanceData)
+#         appendRowToExperimentDf(experimentData, row)
+# saveResultsToCsv(experimentData, ResultsSetAPath)
 
 # experimentData = initializeExperimentData()
 # instanceData = initializeInstanceData()
