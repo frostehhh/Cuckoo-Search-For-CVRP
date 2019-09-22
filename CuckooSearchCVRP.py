@@ -451,7 +451,7 @@ class CuckooSearch:
                 rNodeIdx.append(1)
 
             _solr1.route[rNodeIdx[0]], _solr3.route[rNodeIdx[2]] = _solr3.route[rNodeIdx[2]], _solr1.route[rNodeIdx[0]]
-            _solr2.route[rNodeIdx[1]], _solr2.route[rNodeIdx[3]] = _solr2.route[rNodeIdx[3]], _solr2.route[rNodeIdx[1]]
+            _solr2.route[rNodeIdx[1]], _solr4.route[rNodeIdx[3]] = _solr4.route[rNodeIdx[3]], _solr2.route[rNodeIdx[1]]
 
             self.instance.recalculate_route_demand_cost(_solr1)
             self.instance.recalculate_route_demand_cost(_solr2)
@@ -529,6 +529,21 @@ class CuckooSearch:
                     else:
                         self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
                     self.instance.recalculate_solution_cost(sol)    
+    def __exchangeIntra(self,sol):
+        #takes solution as input
+        # select route randomly
+        # select 2 random nodes and swap
+        numRoutes = len(sol.routes) 
+        # select random route and random node
+        rRouteIdx = random.randrange(0, numRoutes)
+        if len(sol.routes[rRouteIdx].route) >= 4:
+            while True:
+                rNode = random.choices(range(1,len(sol.routes[rRouteIdx].route)-1), k=2) 
+                if rNode[0] != rNode[1]:
+                    break               
+            sol.routes[rRouteIdx].route[rNode[0]], sol.routes[rRouteIdx].route[rNode[1]]  = sol.routes[rRouteIdx].route[rNode[1]], sol.routes[rRouteIdx].route[rNode[0]]
+            self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
+            self.instance.recalculate_solution_cost(sol)
     def __reinsertionIntra(self,sol):
         #takes solution as input
         # select route randomly
@@ -553,21 +568,8 @@ class CuckooSearch:
         sol.routes[rRouteIdx].route.insert(rSwapIdx,rNode)
         self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
         self.instance.recalculate_solution_cost(sol)
-    def __exchangeIntra(self,sol):
-        #takes solution as input
-        # select route randomly
-        # select 2 random nodes and swap
-        numRoutes = len(sol.routes) 
-        # select random route and random node
-        rRouteIdx = random.randrange(0, numRoutes)
-        if len(sol.routes[rRouteIdx].route) >= 4:
-            while True:
-                rNode = random.choices(range(1,len(sol.routes[rRouteIdx].route)-1), k=2) 
-                if rNode[0] != rNode[1]:
-                    break               
-            sol.routes[rRouteIdx].route[rNode[0]], sol.routes[rRouteIdx].route[rNode[1]]  = sol.routes[rRouteIdx].route[rNode[1]], sol.routes[rRouteIdx].route[rNode[0]]
-            self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
-            self.instance.recalculate_solution_cost(sol)
+    def __orOpt2(self,sol):
+        pass
     #endregion
     
 
