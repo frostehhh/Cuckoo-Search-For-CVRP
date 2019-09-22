@@ -116,13 +116,7 @@ class CuckooSearch:
 
         iterateNum = math.ceil(r)
         for i in range(iterateNum):
-            self.__twoOptInter(nest)
-        # if choice == 1:
-        #     for i in range(iterateNum):
-        #         self.__exchangeIntra(nest)
-        # elif choice == 2:
-        #     for i in range(iterateNum):
-        #         self.__shift1(nest)
+            self.__shift2(nest)
 
     #endregion
     #region gaussian implementation
@@ -453,6 +447,7 @@ class CuckooSearch:
                     _rPlacement = random.choice(range(1,len(route.route)))
                     route.route.insert(_rPlacement,rNode[1])
                     route.route.insert(_rPlacement,rNode[0])
+                    _tempSol2 = sol.routes[rRouteIdx].route
                     del sol.routes[rRouteIdx].route[rNodeIdx]
                     del sol.routes[rRouteIdx].route[rNodeIdx]
                     self.instance.recalculate_route_demand_cost(route)
@@ -462,7 +457,8 @@ class CuckooSearch:
                         del sol.routes[rRouteIdx]
                     else:
                         self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
-                    self.instance.recalculate_solution_cost(sol)    
+                    self.instance.recalculate_solution_cost(sol)  
+                    break  
     def __exchangeIntra(self,sol):
         #takes solution as input
         # select route randomly
