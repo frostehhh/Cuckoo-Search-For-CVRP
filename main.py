@@ -10,7 +10,7 @@ from CuckooSearchCVRP import CuckooSearch
 #Initialize Cuckoo SearchParameters
 numNests = 15
 Pa = 0.25 # Fraction of worse solutions to be replaced
-Pc = 1 # Fraction of cuckoos performing Levy Flights
+Pc = 0.6 # Fraction of cuckoos performing Levy Flights
 maxGenerations = 500# maximum number of iterations
 stopCriterion = maxGenerations # attempt limit of successive iterations
 
