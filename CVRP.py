@@ -127,7 +127,6 @@ class CVRPInfo():
         optimalRoutes = self.__findOptimalSplit(feasibleRoutes, customerNodes)
 
         return self.create_solution(optimalRoutes)
-        print()
 
     def __generateAllFeasibleRoutes(self, customerNodes):
         feasibleRoutes = [[] for i in range(len(customerNodes))]
@@ -161,25 +160,27 @@ class CVRPInfo():
         for i, routeList in enumerate(feasibleRoutes):
             # check where the routes in the current routeList can be appended
             try:
-                for solution in solutionList[i-1]:
+                for solution in solutionList:
+                    if solution == 0:
+                        continue
                     # solutionListToDelete.append(solution)
                     # create solutions for the solution
                     for route in routeList:
                         _solution = deepcopy(solution)
-                        _solution.append(route)
+                        _solution.routes.append(route)
                         solutionListToAppend.append(_solution)
                 # append solutions to solutionList[i]
                 for solution in solutionListToAppend:
-                    endNode = solution[-1].route[-2]
+                    endNode = solution.routes[-1].route[-2]
                     endNodeIdx = customerNodes.index(endNode)
                     try:
+                        self.recalculate_solution_cost(solution)
                         if solution.cost < solutionList[endNodeIdx].cost:
-                            solutionList[endNodeIdx].append(solution)
+                            solutionList[endNodeIdx] = solution
                     # if the index does not exist, add
                     except IndexError:
-                        solutionList.append([])
-                        solutionList[endNodeIdx].append(solution)
-                solutionList[i-1] = []
+                        solutionList.append(solution)
+                solutionList[i-1] = 0
                 solutionListToAppend = []
                     # delete all unnecessary solutions
                     # solutionList = [sol for sol in solutionList if sol not 
@@ -189,20 +190,14 @@ class CVRPInfo():
             # if solutionList is empty
             except IndexError:
                 if solutionList == []:
-                    solutionList.append([])
                     for route in routeList:
-                        endNode = route.route[-2]
-                        endNodeIdx = customerNodes.index(endNode)
-                        try:
-                            solutionList[endNodeIdx].append([route])
-                        # if the index does not exist, add
-                        except IndexError:
-                            solutionList.append([])
-                            solutionList[endNodeIdx].append([route])
+                        sol = self.create_solution([route])
+                        solutionList.append(sol)
+                        
             # prevNode = customerNodes[i]
             # compute all routes to add the the given _solNum
             
-        return 'filler'
+        return solutionList[-1]
 
     #endregion
 
