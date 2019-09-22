@@ -105,13 +105,20 @@ def saveResultsToCsv(df, path):
                         _ = '0' + str(fileNum)
                 else:
                         _ = str(fileNum)
-                if os.path.exists(path + 'results' + path[13] + _ + '.csv'):
+                if os.path.exists(path + 'results' + path[8] + _ + '.csv'):
                         fileNum += 1
                         continue
                 else:
-                        df.to_csv(path + 'results' + path[13] + _ + '.csv')
-                        print('Saved ' + 'results' + path[13] + _ + '.csv')
+                        df.to_csv(path + 'results' + path[8] + _ + '.csv')
+                        print('Saved ' + 'results' + path[8] + _ + '.csv')
                         break
+                # if os.path.exists(path + 'results' + path[13] + _ + '.csv'):
+                #         fileNum += 1
+                #         continue
+                # else:
+                #         df.to_csv(path + 'results' + path[13] + _ + '.csv')
+                #         print('Saved ' + 'results' + path[13] + _ + '.csv')
+                #         break
 # def saveResultsInfoTxt(string, path):
 #         fileNum = 0
 #         while True:
