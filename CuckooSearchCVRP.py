@@ -109,9 +109,8 @@ class CuckooSearch:
     def __performLevyFlights(self, nest):
         # Generate random value x from levy 
         # According to randomly generated value, perform 2-opt x time or double-bridge
-        
+        r = self.__generateLevyStep()
         #region 2-opt and double-bridge
-        # r = self.__generateLevyStep()
         
         # twoOptIter = 0
         # doubleBridgeIter = 1
@@ -123,9 +122,7 @@ class CuckooSearch:
         # for i in range(doubleBridgeIter):
         #     self.__doubleBridgeInter(nest)
         #endregion
-        #region 2-opt and shift-1-0
-        # r = self.__generateLevyStep()
-        
+        #region 2-opt and shift-1-0        
         # twoOptIter = 0
         # doubleBridgeIter = 0
         # shift1Iter = 0
@@ -146,8 +143,6 @@ class CuckooSearch:
         #     self.__doubleBridgeInter(nest)
         #endregion
         #region testing shift-2-0
-        r = self.__generateLevyStep()
-        
         shift2Iter = 10
         upperBound = 6
 
