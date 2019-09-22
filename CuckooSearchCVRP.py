@@ -111,7 +111,6 @@ class CuckooSearch:
         # According to randomly generated value, perform 2-opt x time or double-bridge
         r = self.__generateLevyStep()
         #region 2-opt and double-bridge
-        
         # twoOptIter = 0
         # doubleBridgeIter = 1
 
@@ -126,7 +125,7 @@ class CuckooSearch:
         # twoOptIter = 0
         # doubleBridgeIter = 0
         # shift1Iter = 0
-        # upperBound = 6
+        # upperBound = 99
 
 
         # choice = random.choice([1,2])
@@ -391,8 +390,7 @@ class CuckooSearch:
                 return self.instance.recalculate_solution_cost(sol)
         # no change performed
         return sol
-
-    # not done
+        
     def __shift2(self,sol):
         # takes solution as input
         # select route randomly
@@ -408,8 +406,11 @@ class CuckooSearch:
             for i, route in enumerate(sol.routes):
                 if i != r and route.demand + rNodeDemand[0] + rNodeDemand[1] < self.instance.capacity:
                     route.route = route.route[:-1]
-                    route.route.append(rNode[0])
-                    route.route.append(rNode[1])
+                    _rPlacement = random.choice(range(1,len(route.route)))
+                    route.route.insert(_rPlacement,rNode[1])
+                    route.route.insert(_rPlacement,rNode[0])
+                    # route.route.append(rNode[0])
+                    # route.route.append(rNode[1])
                     route.route.append(0)
                     del sol.routes[r].route[n]
                     del sol.routes[r].route[n]
@@ -425,6 +426,7 @@ class CuckooSearch:
             return sol   
         return sol
     #endregion
+    
 
     def readData(self):
         data = {
