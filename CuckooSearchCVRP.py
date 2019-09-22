@@ -573,7 +573,7 @@ class CuckooSearch:
             "Name" : self.instance.fileName,
             "Best Solution Cost" : self.nests[0].cost,
             "Optimal Value" : self.instance.optimalValue,
-            "Run Time" : self.time,
+            "Run Time" : float(self.time),
             "Solution" : self.nests
         }
         return data
