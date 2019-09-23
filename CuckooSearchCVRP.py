@@ -117,13 +117,17 @@ class CuckooSearch:
         if iterateNum > 6:
             iterateNum = 6
 
-        smallStepChoice = random.choice([1,2])
-        if smallStepChoice == 1:
-            for i in range(iterateNum):
-                self.__swap2_1(nest)
+        
+        if iterateNum <= 4:
+            smallStepChoice = random.choice([1,2])
+            if smallStepChoice == 1:
+                for i in range(iterateNum):
+                    self.__swap2_1(nest)
+            else:
+                for i in range(iterateNum):
+                    self.__shift1(nest)
         else:
-            for i in range(iterateNum):
-                self.__reinsertionIntra(nest)
+            self.__doubleBridgeInter(nest)
         # if iterateNum <= 4:
         #     for i in range(iterateNum):
         #         self.__swap2_1(nest)
