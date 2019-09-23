@@ -1,0 +1,6 @@
+Parameters: numNests = 15 Pa = 0.25 Pc = 0.6 maxGenerations: 1000 stopCriterion = 1000
+Implementation: 
+Cuckoo Search Parameters: Pa, Pc
+Neighborhood Structures: swap-2-1(50%) or shift-1(50%) (levy <=6)
+Notes
+
