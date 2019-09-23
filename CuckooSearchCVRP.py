@@ -125,7 +125,7 @@ class CuckooSearch:
                     self.__swap2_1(nest)
             else:
                 for i in range(iterateNum):
-                    self.__shift1(nest)
+                    self.__reinsertionIntra(nest)
         else:
             self.__doubleBridgeInter(nest)
         # if iterateNum <= 4:
