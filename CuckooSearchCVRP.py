@@ -110,13 +110,25 @@ class CuckooSearch:
         # Generate random value x from levy 
         # According to randomly generated value, perform 2-opt x time or double-bridge
         r = self.__generateLevyStep()
-        
-        # choice = random.choice([1,2])
-        # choice = 2
-
+        r = abs(r)
         iterateNum = math.ceil(r)
-        for i in range(iterateNum):
-            self.__shift2(nest)
+
+        upperBound = 6
+        if iterateNum > 6:
+            iterateNum = 6
+
+        smallStepChoice = random.choice([1,2])
+        if smallStepChoice == 1:
+            for i in range(iterateNum):
+                self.__swap2_1(nest)
+        else:
+            for i in range(iterateNum):
+                self.__reinsertionIntra(nest)
+        # if iterateNum <= 4:
+        #     for i in range(iterateNum):
+        #         self.__swap2_1(nest)
+        # else:
+        #     self.__doubleBridgeInter(nest)
 
     #endregion
     #region gaussian implementation
