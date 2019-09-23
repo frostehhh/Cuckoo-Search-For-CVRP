@@ -28,7 +28,69 @@ class CuckooSearch:
     
     """
 
+    #region initialize with random solution
+    # def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
+    #     self.instance = CVRPInstance
+    #     self.Pa = Pa
+    #     self.Pc = Pc
+    #     self.generations = generations
+    #     self.pdf_type = pdf_type
+    #     self.numCuckoos = numCuckoos
+    #     self.nests = []
+    #     self.numFailedAttemptsLevyLimit = 1
+    #     random.seed()
 
+    #     start = timer()
+    #     self.solveInstance()
+    #     end = timer()
+    #     self.time = str("{0:.2f}".format(end - start)) 
+        
+    #     lenRoute = 0
+    #     for route in self.nests[0].routes:
+    #         lenRoute += len(route.route) - 2
+
+    #     print('Dataset: ' + self.instance.fileName + ', Run time: ' + self.time 
+    #         + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' 
+    #         + str(self.instance.optimalValue) + ' routesGen(gen, min) = ' + str(len(self.nests[0].routes)) 
+    #         + ', ' + str(self.instance.minNumVehicles) + ' numNodes(gen, req) = ' 
+    #         + str(lenRoute+1) + ', ' + str(self.instance.dimension))
+
+    # def solveInstance(self):
+    #     # Initialize Solutions
+    #     for i in range(self.numCuckoos):
+    #         sol = self.instance.create_random_solution() # Initialize Solution
+    #         self.nests.append(sol)
+        
+    #     for i in range(self.generations):   
+    #         # sort nests by cost
+    #         self.nests.sort(key = o.attrgetter('cost'))
+
+    #         # Search, and Evaluate with fraction Pc of Cuckoos of best cuckoos
+    #         PcNum = math.floor(self.numCuckoos * self.Pc)
+    #         for j in range(PcNum):
+    #             _levyNest = deepcopy(self.nests[j])
+    #             self.__performLevyFlights(_levyNest)
+               
+    #             # Randomly select a nest to compare with
+    #             _nestCompare = random.randrange(1, self.numCuckoos)
+
+    #             # If the generated solution is better than a randomly selected nest
+    #             if _levyNest.cost < self.nests[_nestCompare].cost:
+    #                 self.nests[_nestCompare] = deepcopy(_levyNest)
+            
+    #         # Abandon a fraction Pa of worse Cuckoos. Generate new random solutions for replacement
+    #         self.nests.sort(key = o.attrgetter('cost'), reverse=True)
+    #         PaNum = math.floor(self.numCuckoos * self.Pa)
+    #         # Compute probability of each nest to be abandoned except the best nest
+    #         for j in range(1, PaNum):
+    #             del self.nests[0] # Abandon nest
+    #             sol = self.instance.create_random_solution()
+    #             self.nests.append(sol)
+
+    #         # Sort from best to worst and keep best solution
+    #         self.nests.sort(key = o.attrgetter('cost'))
+    #endregion
+    #region initialize with non-random heuristic, clarke-wright savings method
     def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
         self.instance = CVRPInstance
         self.Pa = Pa
@@ -39,6 +101,7 @@ class CuckooSearch:
         self.nests = []
         self.numFailedAttemptsLevyLimit = 1
         random.seed()
+        self.initialSolution = self.instance.create_random_solution()
 
         start = timer()
         self.solveInstance()
@@ -51,14 +114,15 @@ class CuckooSearch:
 
         print('Dataset: ' + self.instance.fileName + ', Run time: ' + self.time 
             + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' 
-            + str(self.instance.optimalValue) + ' routesGen(gen, min) = ' + str(len(self.nests[0].routes)) 
-            + ', ' + str(self.instance.minNumVehicles) + ' numNodes(gen, req) = ' 
-            + str(lenRoute+1) + ', ' + str(self.instance.dimension))
+            + str(self.instance.optimalValue) + ', clarkeSol: ' + str(self.initialSolution.cost)
+            + ', routesGen(gen, min) = ' + str(len(self.nests[0].routes)) 
+            + ', ' + str(self.instance.minNumVehicles))
+            # ' numNodes(gen, req) = ' + str(lenRoute+1) + ', ' + str(self.instance.dimension))
 
     def solveInstance(self):
         # Initialize Solutions
         for i in range(self.numCuckoos):
-            sol = self.instance.create_random_solution() # Initialize Solution
+            sol = self.initialSolution # Initialize Solution
             self.nests.append(sol)
         
         for i in range(self.generations):   
@@ -84,13 +148,13 @@ class CuckooSearch:
             # Compute probability of each nest to be abandoned except the best nest
             for j in range(1, PaNum):
                 del self.nests[0] # Abandon nest
-                sol = self.instance.create_random_solution()
+                sol = self.initialSolution
                 self.nests.append(sol)
 
             # Sort from best to worst and keep best solution
             self.nests.sort(key = o.attrgetter('cost'))
-    
-    
+    #endregion
+
     #region original levy flight implementation, levy step = number of 2-opt
     def __generateLevyStep(self):
         """

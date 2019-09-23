@@ -282,9 +282,6 @@ class CVRPInfo():
         return self.create_solution(routes)
 
     def __calculateCustomerSavings(self):
-        """
-        
-        """
         class Savings:
             def __init__(self, savings, nodeIdx1, nodeIdx2):
                 self.savings = savings
@@ -388,21 +385,6 @@ class CVRPInfo():
 
     #     return self.create_solution(final_routes)
     #endregion
-
-
-    def refresh(self, solution):
-        solution.cost, solution.demand = 0, 0
-        for route_obj in solution.routes:
-            route = route_obj.route
-            route_obj.demand, route_obj.cost = 0, 0
-            for i in range(0, len(route) - 1):
-                route_obj.demand += self.listDemand[route[i]]
-                route_obj.cost += self.dist[route[i]][route[i + 1]]
-            solution.cost += route_obj.cost
-            solution.demand += route_obj.demand
-            if route_obj.demand > self.capacity:
-                route_obj.is_valid = False
-                solution.is_valid = False
 
     def visualise(self, solution):
         im = Image.new( 'RGB', (500,500), "white") # create a new black image
