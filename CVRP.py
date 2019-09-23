@@ -81,84 +81,85 @@ class CVRPInfo():
         return sol        
 
     #region original create random solution
-    def create_random_solution(self):
-        unserviced = [i for i in range(1, self.dimension)]
-        random.shuffle(unserviced)
-        routes = [] # list of all routes
-        cur_route = [0] # start with depot node
-        route_demand = 0
-        route_length = 0
-
-        while unserviced:
-            node = unserviced[0]
-            if route_demand + self.listDemand[node] <= self.capacity:
-                cur_route += [node]
-                route_length += 1
-                route_demand += self.listDemand[node]
-                del unserviced[0]
-                continue
-            else:
-                routes += [self.create_route(cur_route + [0])] # end with depot node
-                # Reset variables for next iteration
-                cur_route = [0] 
-                route_demand = 0
-                route_length = 0
-        routes += [self.create_route(cur_route + [0])]
-
-        return self.create_solution(routes)
-    #endregion
-
-    #region create random solution. min-cost algorithm. sorted from closest to farthest
     # def create_random_solution(self):
-    #     """
-    #     In this implementation, min-cost paths are generated while satisfying
-    #     capacity constraints.
-    #     """
     #     unserviced = [i for i in range(1, self.dimension)]
+    #     random.shuffle(unserviced)
     #     routes = [] # list of all routes
     #     cur_route = [0] # start with depot node
     #     route_demand = 0
     #     route_length = 0
-    #     curr_node = 0
 
     #     while unserviced:
-    #         # get nearest node to current node
-    #         # self.dist[currNode][i]
-    #         # get unserviced nodes sorted by nearest to farthest
-    #         dist_currNode_to_unserviced = []
-    #         for node in unserviced:
-    #             dist_currNode_to_unserviced += [self.dist[curr_node][node]]
-    #         # unpack sorted unserviced nodes
-    #         dist_currNode_to_unserviced, unserviced = [list(x) for x in zip(*sorted(zip(dist_currNode_to_unserviced, unserviced)))]
-
-    #         for i, node in enumerate(unserviced):
-    #             if route_demand + self.listDemand[node] <= self.capacity:
-    #                 cur_route += [node]
-    #                 route_length += 1
-    #                 route_demand += self.listDemand[node]
-    #                 del unserviced[i], dist_currNode_to_unserviced[i]
-    #                 if route_demand == self.capacity:
-    #                     routes += [self.create_route(cur_route + [0])] # end with depot node
-    #                     # Reset variables for next iteration
-    #                     cur_route = [0] 
-    #                     route_demand = 0
-    #                     route_length = 0
-    #                     curr_node = 0
-    #                 else:
-    #                     curr_node = node
-    #                 break
+    #         node = unserviced[0]
+    #         if route_demand + self.listDemand[node] <= self.capacity:
+    #             cur_route += [node]
+    #             route_length += 1
+    #             route_demand += self.listDemand[node]
+    #             del unserviced[0]
+    #             continue
     #         else:
     #             routes += [self.create_route(cur_route + [0])] # end with depot node
     #             # Reset variables for next iteration
     #             cur_route = [0] 
     #             route_demand = 0
     #             route_length = 0
-
     #     routes += [self.create_route(cur_route + [0])]
 
     #     return self.create_solution(routes)
     #endregion
-    #region random solution, add to route with lowest capacity
+
+    #region create random solution. min-cost algorithm. sorted from closest to farthest
+    def create_random_solution(self):
+        """
+        In this implementation, min-cost paths are generated while satisfying
+        capacity constraints.
+        """
+        unserviced = [i for i in range(1, self.dimension)]
+        routes = [] # list of all routes
+        cur_route = [0] # start with depot node
+        route_demand = 0
+        route_length = 0
+        curr_node = 0
+
+        while unserviced:
+            # get nearest node to current node
+            # self.dist[currNode][i]
+            # get unserviced nodes sorted by nearest to farthest
+            dist_currNode_to_unserviced = []
+            for node in unserviced:
+                dist_currNode_to_unserviced += [self.dist[curr_node][node]]
+            # unpack sorted unserviced nodes
+            dist_currNode_to_unserviced, unserviced = [list(x) for x in zip(*sorted(zip(dist_currNode_to_unserviced, unserviced)))]
+
+            for i, node in enumerate(unserviced):
+                if route_demand + self.listDemand[node] <= self.capacity:
+                    cur_route += [node]
+                    route_length += 1
+                    route_demand += self.listDemand[node]
+                    del unserviced[i], dist_currNode_to_unserviced[i]
+                    if route_demand == self.capacity:
+                        routes += [self.create_route(cur_route + [0])] # end with depot node
+                        # Reset variables for next iteration
+                        cur_route = [0] 
+                        route_demand = 0
+                        route_length = 0
+                        curr_node = 0
+                    else:
+                        curr_node = node
+                    break
+            else:
+                routes += [self.create_route(cur_route + [0])] # end with depot node
+                # Reset variables for next iteration
+                cur_route = [0] 
+                route_demand = 0
+                route_length = 0
+                curr_node = 0
+
+        routes += [self.create_route(cur_route + [0])]
+
+        return self.create_solution(routes)
+    # endregion
+    #region random solution, add to route with lowest capacity # this ain't rigth kasi di dapat alam agad yung num of routes
     # def create_random_solution(self):
     #     unserviced = [i for i in range(1, self.dimension)]
     #     random.shuffle(unserviced)
