@@ -158,6 +158,95 @@ class CVRPInfo():
 
     #     return self.create_solution(routes)
     #endregion
+    #region random solution, add to route with lowest capacity
+    # def create_random_solution(self):
+    #     unserviced = [i for i in range(1, self.dimension)]
+    #     random.shuffle(unserviced)
+    #     routes = [[0] for i in range(self.minNumVehicles)] #list of all routes
+        
+    #     route_demand = [0 for i in range(self.minNumVehicles)]
+        
+    #     debugiterationcount = 0
+    #     # iterate through each route
+    #     # randomly select an unserviced node to add to that current route
+    #     while unserviced:
+    #         print('debugiterationcount: ' + str(debugiterationcount))
+    #         node = unserviced[0]
+    #         sortedRoutes = [route for _,route in sorted(zip(route_demand,routes))]
+    #         routes = sortedRoutes
+    #         route_demand.sort()
+
+    #         pass
+    #         # If the route can still accomodate the node
+    #         # cycle through all routes
+    #         for i, route in enumerate(routes):
+    #             if route_demand[i] + self.listDemand[node] <= self.capacity:
+    #                 route += [node]
+    #                 route_demand[i] += self.listDemand[node]
+    #                 del unserviced[0]
+    #                 break
+    #         else:
+    #             print('no feasible solution found sa create_random_solution')
+    #             for route in routes:
+    #                 pass
+    #                 # shift 1 node from a route to another route to accomodate 
+    #                 # the node that cannot be inserted
+               
+    #         debugiterationcount += 1 
+        
+    #     final_routes = []
+    #     for i in range(len(routes)):
+    #         final_routes += [self.create_route(routes[i] + [0])]
+    #     return self.create_solution(final_routes)
+    #endregion
+
+    #region create random solution, add 1 node per route in each iteration, cycle through routes.
+    # def create_random_solution(self):
+    #     unserviced = [i for i in range(1, self.dimension)]
+    #     random.shuffle(unserviced)
+    #     free_routes = [[0] for i in range(self.minNumVehicles)] #list of all routes
+    #     final_routes = []
+        
+    #     free_route_demand = [0 for i in range(self.minNumVehicles)]
+    #     final_route_demand = []
+
+    #     free_route_count = self.minNumVehicles
+    #     currRoute = 0
+        
+    #     debugiterationcount = 0
+    #     # iterate through each route
+    #     # randomly select an unserviced node to add to that current route
+    #     while unserviced:
+    #         print('debugiterationcount: ' + str(debugiterationcount))
+    #         node = unserviced[0]
+    #         # If the route can still accomodate the node
+    #         if free_route_demand[currRoute] + self.listDemand[node] <= self.capacity:
+    #             free_routes[currRoute] += [node]
+    #             free_route_demand[currRoute] += self.listDemand[node]
+    #             currRoute += 1
+    #             if currRoute == free_route_count:
+    #                 currRoute = 0
+    #             del unserviced[0]
+    #         # If the route cannot accomodate the node
+    #         else: 
+    #             currRoute += 1
+    #             if currRoute == free_route_count:
+    #                 currRoute = 0
+    #             # final_routes += [self.create_route(free_routes[currRoute] + [0])]
+    #             # final_route_demand += [free_route_demand[currRoute]]
+    #             # del free_routes[currRoute]
+    #             # del free_route_demand[currRoute]
+    #             # free_route_count -= 1
+    #             # if currRoute >= free_route_count:
+    #             #     currRoute = 0
+    #         debugiterationcount += 1 
+    #     if free_route_count > 0:
+    #         for i in range(free_route_count):
+    #             final_routes += [self.create_route(free_routes[i] + [0])]
+    #             final_route_demand += [free_route_demand[i]]
+
+    #     return self.create_solution(final_routes)
+    #endregion
 
 
     def refresh(self, solution):
