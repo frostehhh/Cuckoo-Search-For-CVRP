@@ -98,7 +98,7 @@ def calculateInstanceResults(instanceData):
                 ,minSolCost, maxSolCost, avgSolCost, stdSolCost, avgRunTime)
         print()
         return data
-def saveResultsToCsv(df, path, type='results'):
+def saveResultsToCsv(df, path, fileNameSuffix, type='results'):
         df = pd.DataFrame(df)
         # write to results.csv
         fileNum = 0
@@ -112,16 +112,16 @@ def saveResultsToCsv(df, path, type='results'):
                                 fileNum += 1
                                 continue
                         else:
-                                df.to_csv(path + 'results' + path[8] + _ + '.csv')
-                                print('Saved ' + 'results' + path[8] + _ + '.csv')
+                                df.to_csv(path + 'results' + path[8] + _ + '_' + fileNameSuffix + '.csv')
+                                print('Saved ' + 'results' + path[8] + _ + '_' + fileNameSuffix + '.csv')
                                 break
                 elif type == 'finalresults':
-                        if os.path.exists(path + 'results' + path[13] + _ + '.csv'):
+                        if os.path.exists(path + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv'):
                                 fileNum += 1
                                 continue
                         else:
-                                df.to_csv(path + 'results' + path[13] + _ + '.csv')
-                                print('Saved ' + 'results' + path[13] + _ + '.csv')
+                                df.to_csv(path + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv')
+                                print('Saved ' + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv')
                                 break
 # def saveResultsInfoTxt(string, path):
 #         fileNum = 0
@@ -152,6 +152,7 @@ print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' 
 ' maxGenerations: ' + str(maxGenerations) + ' stopCriterion = ' + str(stopCriterion))
 
 #region iterate once
+fileNameSuffix = 'twoOpt_exchange_5050_levy6_savingsInitial'
 data = []
 data = initializeInstanceData()
 for dataset in DataSetA:
@@ -159,7 +160,7 @@ for dataset in DataSetA:
         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
         solver.solveInstance()
         appendRowToInstanceDf(data, solver.readData())
-saveResultsToCsv(data, ResultsSetAPath)
+saveResultsToCsv(data, ResultsSetAPath, fileNameSuffix)
 
 data = initializeInstanceData()
 for dataset in DataSetB:
@@ -167,7 +168,7 @@ for dataset in DataSetB:
         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
         solver.solveInstance()
         appendRowToInstanceDf(data, solver.readData())
-saveResultsToCsv(data, ResultsSetBPath)
+saveResultsToCsv(data, ResultsSetBPath, fileNameSuffix)
 
 data = initializeInstanceData()
 for dataset in DataSetP:
@@ -175,7 +176,7 @@ for dataset in DataSetP:
         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
         solver.solveInstance()
         appendRowToInstanceDf(data, solver.readData())
-saveResultsToCsv(data, ResultsSetPPath)
+saveResultsToCsv(data, ResultsSetPPath, fileNameSuffix)
 #endregion
 #region iterate 30 times
 # numIter = 10

@@ -90,6 +90,7 @@ class CuckooSearch:
     #         # Sort from best to worst and keep best solution
     #         self.nests.sort(key = o.attrgetter('cost'))
     #endregion
+    
     #region initialize with non-random heuristic, clarke-wright savings method
     def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
         self.instance = CVRPInstance
@@ -112,9 +113,11 @@ class CuckooSearch:
         for route in self.nests[0].routes:
             lenRoute += len(route.route) - 2
 
-        print('Dataset: ' + self.instance.fileName + ', Run time: ' + self.time 
-            + ', Best Solution Cost: ' + str(self.nests[0].cost) + ', Optimal Value: ' 
-            + str(self.instance.optimalValue) + ', clarkeSol: ' + str(self.initialSolution.cost)
+        print('Dataset: ' + self.instance.fileName 
+            + ', Optimal Value: ' + str(self.instance.optimalValue)
+            + ', Best Solution Cost: ' + str(self.nests[0].cost)
+            + ', clarkeSol: ' + str(self.initialSolution.cost)
+            + ', Run time: ' + self.time 
             + ', routesGen(gen, min) = ' + str(len(self.nests[0].routes)) 
             + ', ' + str(self.instance.minNumVehicles))
             # ' numNodes(gen, req) = ' + str(lenRoute+1) + ', ' + str(self.instance.dimension))
@@ -178,23 +181,38 @@ class CuckooSearch:
         iterateNum = math.ceil(r)
 
         upperBound = 6
-        if iterateNum > 6:
-            iterateNum = 6
+        if iterateNum > upperBound:
+            iterateNum = upperBound
 
+        # One Small Neighborhood
+        # for i in range(iterateNum):
+        #     self.__swap2_2(nest)
         
-        if iterateNum <= 4:
-            smallStepChoice = random.choice([1,2])
-            if smallStepChoice == 1:
-                for i in range(iterateNum):
-                    self.__swap2_1(nest)
-            else:
-                for i in range(iterateNum):
-                    self.__reinsertionIntra(nest)
+        # Two Small Neighborhood
+        smallStepChoice = random.choice([1,2])
+        if smallStepChoice == 1:
+            for i in range(iterateNum):
+                self.__twoOptInter(nest)
         else:
-            self.__doubleBridgeInter(nest)
+            for i in range(iterateNum):
+                self.__exchangeIntra(nest)
+
+        # Two  Small Neighborhood and One Large
+        # if iterateNum <= 4:
+        #     smallStepChoice = random.choice([1,2])
+        #     if smallStepChoice == 1:
+        #         for i in range(iterateNum):
+        #             self.__swap2_1(nest)
+        #     else:
+        #         for i in range(iterateNum):
+        #             self.__reinsertionIntra(nest)
+        # else:
+        #     self.__doubleBridgeInter(nest)
+
+        # One Small Neighborhood and One Large
         # if iterateNum <= 4:
         #     for i in range(iterateNum):
-        #         self.__swap2_1(nest)
+        #         self.__twoOptInter(nest)
         # else:
         #     self.__doubleBridgeInter(nest)
 
