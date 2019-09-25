@@ -1,6 +1,0 @@
-Parameters: numNests = 15 Pa = 0.25 Pc = 0.6 maxGenerations: 1000 stopCriterion = 1000
-Implementation:
-Cuckoo Search Parameters: Pa, Pc
-Neighborhood Structures: 2-opt, shift-1-0
-Notes
-no levy flight upper bound

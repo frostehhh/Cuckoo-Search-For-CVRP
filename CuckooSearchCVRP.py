@@ -214,7 +214,7 @@ class CuckooSearch:
         #     for i in range(iterateNum):
         #         self.__twoOptInter(nest)
         # else:
-        #     self.__doubleBridgeInter(nest)
+        #     self.__swap2_2(nest)
 
     #endregion
     #region gaussian implementation
