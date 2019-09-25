@@ -1,4 +1,8 @@
-#region definitions
+import pandas as pd
+import os
+import numpy as np
+import math
+
 def initializeInstanceData():
        return {'Name':[],
         'Best Solution Cost':[],
@@ -88,6 +92,14 @@ def saveResultsToCsv(df, path, fileNameSuffix, type='results'):
                         else:
                                 df.to_csv(path + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv')
                                 print('Saved ' + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv')
+                                break
+                else:
+                        if os.path.exists(path + 'results' +  _ + '_' + fileNameSuffix + '.csv'):
+                                fileNum += 1
+                                continue
+                        else:
+                                df.to_csv(path + 'results' +  _ + '_' + fileNameSuffix + '.csv')
+                                print('Saved ' + 'results' +  _ + '_' + fileNameSuffix + '.csv')
                                 break
 # def saveResultsInfoTxt(string, path):
 #         fileNum = 0
