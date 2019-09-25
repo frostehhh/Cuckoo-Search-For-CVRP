@@ -189,13 +189,13 @@ class CuckooSearch:
         #     self.__swap2_2(nest)
         
         # Two Small Neighborhood
-        # smallStepChoice = random.choice([1,2])
-        # if smallStepChoice == 1:
-        #     for i in range(iterateNum):
-        #         self.__swap2_1(nest)
-        # else:
-        #     for i in range(iterateNum):
-        #         self.__swap2_2(nest)
+        smallStepChoice = random.choice([1,2])
+        if smallStepChoice == 1:
+            for i in range(iterateNum):
+                self.__swap2_1(nest)
+        else:
+            for i in range(iterateNum):
+                self.__exchangeIntra(nest)
 
         # Two  Small Neighborhood and One Large
         # if iterateNum <= 4:
@@ -210,11 +210,11 @@ class CuckooSearch:
         #     self.__swap2_2(nest)
 
         # One Small Neighborhood and One Large
-        if iterateNum <= 4:
-            for i in range(iterateNum):
-                self.__twoOptInter(nest)
-        else:
-            self.__swap2_2(nest)
+        # if iterateNum <= 4:
+        #     for i in range(iterateNum):
+        #         self.__twoOptInter(nest)
+        # else:
+        #     self.__swap2_2(nest)
 
     #endregion
     #region gaussian implementation
