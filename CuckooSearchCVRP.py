@@ -195,7 +195,7 @@ class CuckooSearch:
         #         self.__swap2_1(nest)
         # else:
         #     for i in range(iterateNum):
-        #         self.__twoOptInter(nest)
+        #         self.__exchangeIntra(nest)
 
         # Two  Small Neighborhood and One Large
         if iterateNum <= 4:
@@ -205,7 +205,7 @@ class CuckooSearch:
                     self.__swap2_1(nest)
             else:
                 for i in range(iterateNum):
-                    self.__twoOptInter(nest)
+                    self.__shift1(nest)
         else:
             self.__doubleBridgeInter(nest)
 

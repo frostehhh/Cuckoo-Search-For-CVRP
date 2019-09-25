@@ -40,7 +40,7 @@ print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' 
 ' maxGenerations: ' + str(maxGenerations) + ' stopCriterion = ' + str(stopCriterion))
 
 #region iterate once
-fileNameSuffix = 'swap21_exchange_5050_levy6'
+fileNameSuffix = 'swap21_shift1_doubleBridge_5050_levy4_levy5'
 data = []
 data = exp.initializeInstanceData()
 for dataset in DataSetA:
