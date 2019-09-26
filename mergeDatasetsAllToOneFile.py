@@ -9,7 +9,7 @@ import pandas as pd
 
 #region Load Datasets
 DataSetResultsPath = 'mergedresult/'
-DatasetList = os.listdir(DataSetResultsPath) 
+DatasetList = os.listdir(DataSetResultsPath)[1:]
 
 # Read a results + i per iteration. Merge into one file.
 
