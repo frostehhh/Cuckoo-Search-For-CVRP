@@ -189,25 +189,26 @@ class CuckooSearch:
         #     self.__swap2_2(nest)
         
         # Two Small Neighborhood
-        # smallStepChoice = random.choice([1,2])
-        # if smallStepChoice == 1:
-        #     for i in range(iterateNum):
-        #         self.__swap2_1(nest)
-        # else:
-        #     for i in range(iterateNum):
-        #         self.__exchangeIntra(nest)
+        smallStepChoice = random.choice([1,2])
+        smallStepChoice = 1
+        if smallStepChoice == 1:
+            for i in range(iterateNum):
+                self.__crossTwoOpt(nest)
+        else:
+            for i in range(iterateNum):
+                self.__exchangeIntra(nest)
 
         # Two  Small Neighborhood and One Large
-        if iterateNum <= 4:
-            smallStepChoice = random.choice([1,2])
-            if smallStepChoice == 1:
-                for i in range(iterateNum):
-                    self.__twoOptInter(nest)
-            else:
-                for i in range(iterateNum):
-                    self.__reinsertionIntra(nest)
-        else:
-            self.__doubleBridgeInter(nest)
+        # if iterateNum <= 4:
+        #     smallStepChoice = random.choice([1,2])
+        #     if smallStepChoice == 1:
+        #         for i in range(iterateNum):
+        #             self.__cross(nest)
+        #     else:
+        #         for i in range(iterateNum):
+        #             self.__shift1(nest)
+        # else:
+        #     self.__swap2_2(nest)
 
         # One Small Neighborhood and One Large
         # if iterateNum <= 4:
@@ -315,7 +316,60 @@ class CuckooSearch:
     #endregion
 
     #region neighborhood structures
-    def __twoOptInter(self, sol): 
+    # the true twoOptInter
+    def __crossTwoOpt(self,sol):
+        # takes solution as input
+        # gets 2 routes randomly
+        # exchange 2 customer arcs
+        numRoutes = len(sol.routes)
+
+        # Perform Swap
+        IsSwapValid = True
+        numFailedAttempts = 0
+        while IsSwapValid: 
+            while True:
+                rRouteIdx = random.choices(range(numRoutes), k=2)
+                if rRouteIdx[0] != rRouteIdx[1]:
+                    break  
+            
+            # Temporary variables for checking if swap is valid
+            _solr1 = deepcopy(sol.routes[rRouteIdx[0]])
+            _solr2 = deepcopy(sol.routes[rRouteIdx[1]])
+
+            # Randomly select nodes for each arc to swap from each route
+            # start with 1 to disregard depot
+            rNodeIdx = []
+            if (len(sol.routes[rRouteIdx[0]].route) >= 4 and
+                len(sol.routes[rRouteIdx[1]].route) >= 4):
+                rNodeIdx.append(random.randrange(1, len(_solr1.route) - 2))
+                rNodeIdx.append(random.randrange(1, len(_solr2.route) - 2))
+            else:
+                numFailedAttempts +=1 
+                continue
+
+            _tempSolr1 = deepcopy(_solr1)
+            _solr1.route = _solr1.route[:rNodeIdx[0]+1] + _solr2.route[rNodeIdx[1]+1:]
+            _solr2.route = _solr2.route[:rNodeIdx[1]+1] + _tempSolr1.route[rNodeIdx[0]+1:]  
+                        
+
+            self.instance.recalculate_route_demand_cost(_solr1)
+            self.instance.recalculate_route_demand_cost(_solr2)
+
+            if _solr1.demand <= self.instance.capacity:
+                if _solr2.demand <= self.instance.capacity:
+                    sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
+                    sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
+                    self.instance.recalculate_solution_cost(sol)
+                    break
+            
+            numFailedAttempts += 1
+            if numFailedAttempts == self.numFailedAttemptsLevyLimit:
+                break
+
+    def __twoOpt(self,sol):
+        pass
+    # previously twoOptInter
+    def __swap11(self, sol): 
         # takes solution as input
         # gets 2 routes randomly
         # Select random node from each
@@ -342,9 +396,7 @@ class CuckooSearch:
             rNodeIdx.append(random.randrange(1, len(_solr2.route) - 1))
 
             _solr1.route[rNodeIdx[0]], _solr2.route[rNodeIdx[1]] = _solr2.route[rNodeIdx[1]], _solr1.route[rNodeIdx[0]]
-            # _ = _solr1.route[n1]
-            # _solr1.route[n1] = _solr2.route[n2]
-            # _solr2.route[n2] = _
+
             self.instance.recalculate_route_demand_cost(_solr1)
             self.instance.recalculate_route_demand_cost(_solr2)
 
