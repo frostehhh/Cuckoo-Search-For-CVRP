@@ -93,6 +93,10 @@ def saveResultsToCsv(df, path, fileNameSuffix, type='results'):
                                 df.to_csv(path + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv')
                                 print('Saved ' + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv')
                                 break
+                elif type == 'mergeAll':
+                        df.to_csv(path + fileNameSuffix + '.csv')
+                        print('Saved ' + fileNameSuffix + '.csv')
+                        break
                 else:
                         if os.path.exists(path + 'results' +  _ + '_' + fileNameSuffix + '.csv'):
                                 fileNum += 1
