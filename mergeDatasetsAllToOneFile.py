@@ -8,9 +8,11 @@ import os
 import pandas as pd
 import experiment as e
 
-DataSetResultsPath = 'finalresults/'
+
+DataSetResultsPath = 'results/'
 DatasetList = os.listdir(DataSetResultsPath)[1:]
 savePath = 'completeResults/'
+fileName = 'completeResults'
 data = []
 
 # store all datasets in data[] list
@@ -29,6 +31,6 @@ for i in range(1, len(DatasetList)):
 finalData.drop(finalData.columns[0],axis=1, inplace=True)
 finalData.reset_index(inplace=True, drop=True)
 
-e.saveResultsToCsv(finalData, savePath, 'completeFinalResults', 'mergeAll')
+e.saveResultsToCsv(finalData, savePath, fileName, 'mergeAll')
 
 
