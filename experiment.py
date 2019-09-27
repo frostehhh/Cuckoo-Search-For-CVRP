@@ -78,20 +78,20 @@ def saveResultsToCsv(df, path, fileNameSuffix, type='results'):
                 else:
                         _ = str(fileNum)
                 if type == 'results':
-                        if os.path.exists(path + 'results' + path[8] + _ + '.csv'):
+                        if os.path.exists(path + 'results' + _ + '.csv'):
                                 fileNum += 1
                                 continue
                         else:
-                                df.to_csv(path + 'results' + path[8] + _ + '_' + fileNameSuffix + '.csv')
-                                print('Saved ' + 'results' + path[8] + _ + '_' + fileNameSuffix + '.csv')
+                                df.to_csv(path + 'results' + _ + '_' + fileNameSuffix + '.csv')
+                                print('Saved ' + 'results' + _ + '_' + fileNameSuffix + '.csv')
                                 break
                 elif type == 'finalresults':
-                        if os.path.exists(path + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv'):
+                        if os.path.exists(path + 'results' + _ + '_' + fileNameSuffix + '.csv'):
                                 fileNum += 1
                                 continue
                         else:
-                                df.to_csv(path + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv')
-                                print('Saved ' + 'results' + path[13] + _ + '_' + fileNameSuffix + '.csv')
+                                df.to_csv(path + 'results' + _ + '_' + fileNameSuffix + '.csv')
+                                print('Saved ' + 'results' + _ + '_' + fileNameSuffix + '.csv')
                                 break
                 elif type == 'mergeAll':
                         df.to_csv(path + fileNameSuffix + '.csv')
