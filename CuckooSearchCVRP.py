@@ -186,29 +186,29 @@ class CuckooSearch:
 
         # One Small Neighborhood
         # for i in range(iterateNum):
-        #     self.__swap2_2(nest)
+        #     self.__crossTwoOpt(nest)
         
         # Two Small Neighborhood
-        smallStepChoice = random.choice([1,2])
-        smallStepChoice = 1
-        if smallStepChoice == 1:
-            for i in range(iterateNum):
-                self.__crossTwoOpt(nest)
-        else:
-            for i in range(iterateNum):
-                self.__exchangeIntra(nest)
+        # smallStepChoice = random.choice([1,2])
+        # smallStepChoice = 1
+        # if smallStepChoice == 1:
+        #     for i in range(iterateNum):
+        #         self.__crossTwoOpt(nest)
+        # else:
+        #     for i in range(iterateNum):
+        #         self.__exchangeIntra(nest)
 
         # Two  Small Neighborhood and One Large
-        # if iterateNum <= 4:
-        #     smallStepChoice = random.choice([1,2])
-        #     if smallStepChoice == 1:
-        #         for i in range(iterateNum):
-        #             self.__cross(nest)
-        #     else:
-        #         for i in range(iterateNum):
-        #             self.__shift1(nest)
-        # else:
-        #     self.__swap2_2(nest)
+        if iterateNum <= 4:
+            smallStepChoice = random.choice([1,2])
+            if smallStepChoice == 1:
+                for i in range(iterateNum):
+                    self.__crossTwoOpt(nest)
+            else:
+                for i in range(iterateNum):
+                    self.__shift1(nest)
+        else:
+            self.__swap2_2(nest)
 
         # One Small Neighborhood and One Large
         # if iterateNum <= 4:
@@ -350,8 +350,7 @@ class CuckooSearch:
             _tempSolr1 = deepcopy(_solr1)
             _solr1.route = _solr1.route[:rNodeIdx[0]+1] + _solr2.route[rNodeIdx[1]+1:]
             _solr2.route = _solr2.route[:rNodeIdx[1]+1] + _tempSolr1.route[rNodeIdx[0]+1:]  
-                        
-
+                    
             self.instance.recalculate_route_demand_cost(_solr1)
             self.instance.recalculate_route_demand_cost(_solr2)
 
@@ -366,7 +365,7 @@ class CuckooSearch:
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
                 break
 
-    def __twoOpt(self,sol):
+    def __twoOptIntra(self,sol):
         pass
     # previously twoOptInter
     def __swap11(self, sol): 
@@ -496,7 +495,7 @@ class CuckooSearch:
             numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
                 break
-    def __doubleBridgeInter(self, sol):
+    def __crossDoubleBridgeInter(self, sol):
         # takes solution as input
         # gets 4 routes randomly
         # Select random node from each
@@ -524,15 +523,25 @@ class CuckooSearch:
 
             rNodeIdx = []
             # Randomly select nodes to swap from each route
+            if (len(sol.routes[rRouteIdx[0]].route) >= 4 and
+                len(sol.routes[rRouteIdx[1]].route) >= 4 and
+                len(sol.routes[rRouteIdx[2]].route) >= 4 and
+                len(sol.routes[rRouteIdx[3]].route) >= 4
+                ):
+                rNodeIdx.append(random.randrange(1, len(_solr1.route) - 2))
+                rNodeIdx.append(random.randrange(1, len(_solr2.route) - 2))
+                rNodeIdx.append(random.randrange(1, len(_solr3.route) - 2))
+                rNodeIdx.append(random.randrange(1, len(_solr4.route) - 2))
+            else:
+                numFailedAttempts += 1
+                break
             
-            rNodeIdx.append(random.randrange(1, len(_solr1.route) - 1))
-            rNodeIdx.append(random.randrange(1, len(_solr2.route) - 1))
-            rNodeIdx.append(random.randrange(1, len(_solr3.route) - 1))
-            rNodeIdx.append(random.randrange(1, len(_solr4.route) - 1))
-            
-
-            _solr1.route[rNodeIdx[0]], _solr3.route[rNodeIdx[2]] = _solr3.route[rNodeIdx[2]], _solr1.route[rNodeIdx[0]]
-            _solr2.route[rNodeIdx[1]], _solr4.route[rNodeIdx[3]] = _solr4.route[rNodeIdx[3]], _solr2.route[rNodeIdx[1]]
+            _tempSolr = deepcopy(_solr1)
+            _solr1.route = _solr1.route[:rNodeIdx[0]+1] + _solr3.route[rNodeIdx[2]+1:]
+            _solr3.route = _solr3.route[:rNodeIdx[2]+1] + _tempSolr.route[rNodeIdx[0]+1:]  
+            _tempSolr = deepcopy(_solr2)
+            _solr2.route = _solr2.route[:rNodeIdx[1]+1] + _solr4.route[rNodeIdx[3]+1:]
+            _solr4.route = _solr4.route[:rNodeIdx[3]+1] + _tempSolr.route[rNodeIdx[1]+1:]  
 
             self.instance.recalculate_route_demand_cost(_solr1)
             self.instance.recalculate_route_demand_cost(_solr2)
