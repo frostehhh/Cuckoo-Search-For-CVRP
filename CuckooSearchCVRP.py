@@ -345,7 +345,7 @@ class CuckooSearch:
                 rNodeIdx.append(random.randrange(1, len(_solr2.route) - 2))
             else:
                 numFailedAttempts +=1 
-                continue
+                break
 
             _tempSolr1 = deepcopy(_solr1)
             _solr1.route = _solr1.route[:rNodeIdx[0]+1] + _solr2.route[rNodeIdx[1]+1:]
