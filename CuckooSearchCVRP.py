@@ -434,7 +434,7 @@ class CuckooSearch:
                 rNodeIdx.append(random.randrange(1, len(_solr2.route) - 1))
             else:
                 numFailedAttempts +=1 
-                continue
+                break
             
             _solr1.route[rNodeIdx[0]+1], _solr2.route[rNodeIdx[1]] = _solr2.route[rNodeIdx[1]], _solr1.route[rNodeIdx[0]+1]
             _solr2.route.insert(rNodeIdx[1],_solr1.route[rNodeIdx[0]])
@@ -477,7 +477,7 @@ class CuckooSearch:
                 rNodeIdx.append(random.randrange(1, len(_solr2.route) - 2))
             else:
                 numFailedAttempts +=1 
-                continue
+                break
             
             _solr1.route[rNodeIdx[0]], _solr2.route[rNodeIdx[1]] = _solr2.route[rNodeIdx[1]], _solr1.route[rNodeIdx[0]]
             _solr1.route[rNodeIdx[0]+1], _solr2.route[rNodeIdx[1]+1] = _solr2.route[rNodeIdx[1]+1], _solr1.route[rNodeIdx[0]+1] 
