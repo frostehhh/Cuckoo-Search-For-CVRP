@@ -9,10 +9,10 @@ import pandas as pd
 import experiment as e
 
 
-DataSetResultsPath = 'results/'
-DatasetList = os.listdir(DataSetResultsPath)[1:]
-savePath = 'completeResults/'
-fileName = 'completeResults'
+DataSetResultsPath = 'finalresults/'
+DatasetList = os.listdir(DataSetResultsPath)[2:]
+savePath = 'finalresults/'
+fileName = 'completeFinalResults'
 data = []
 
 # store all datasets in data[] list

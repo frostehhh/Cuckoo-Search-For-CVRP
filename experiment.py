@@ -97,7 +97,7 @@ def saveResultsToCsv(df, path, fileNameSuffix, type='results'):
                         df.to_csv(path + fileNameSuffix + '.csv')
                         print('Saved ' + fileNameSuffix + '.csv')
                         break
-                else:
+                else: # extra
                         if os.path.exists(path + 'results' +  _ + '_' + fileNameSuffix + '.csv'):
                                 fileNum += 1
                                 continue
