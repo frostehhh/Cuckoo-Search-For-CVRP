@@ -287,7 +287,6 @@ class CVRPInfo():
     #         final_routes += [self.create_route(routes[i] + [0])]
     #     return self.create_solution(final_routes)
     #endregion
-
     #region create random solution, add 1 node per route in each iteration, cycle through routes.
     # def create_random_solution(self):
     #     unserviced = [i for i in range(1, self.dimension)]

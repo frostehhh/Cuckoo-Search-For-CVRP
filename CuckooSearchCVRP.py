@@ -90,73 +90,6 @@ class CuckooSearch:
             # Sort from best to worst and keep best solution
             self.nests.sort(key = o.attrgetter('cost'))
     #endregion
-    
-    #region initialize with non-random heuristic, clarke-wright savings method
-    # def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
-    #     self.instance = CVRPInstance
-    #     self.Pa = Pa
-    #     self.Pc = Pc
-    #     self.generations = generations
-    #     self.pdf_type = pdf_type
-    #     self.numCuckoos = numCuckoos
-    #     self.nests = []
-    #     self.numFailedAttemptsLevyLimit = 1
-    #     random.seed()
-    #     self.initialSolution = self.instance.create_random_solution()
-
-    #     start = timer()
-    #     self.solveInstance()
-    #     end = timer()
-    #     self.time = str("{0:.2f}".format(end - start)) 
-        
-    #     lenRoute = 0
-    #     for route in self.nests[0].routes:
-    #         lenRoute += len(route.route) - 2
-
-    #     print('Dataset: ' + self.instance.fileName 
-    #         + ', Optimal Value: ' + str(self.instance.optimalValue)
-    #         + ', Best Solution Cost: ' + str(self.nests[0].cost)
-    #         + ', clarkeSol: ' + str(self.initialSolution.cost)
-    #         + ', Run time: ' + self.time 
-    #         + ', routesGen(gen, min) = ' + str(len(self.nests[0].routes)) 
-    #         + ', ' + str(self.instance.minNumVehicles))
-    #         # ' numNodes(gen, req) = ' + str(lenRoute+1) + ', ' + str(self.instance.dimension))
-
-    # def solveInstance(self):
-    #     # Initialize Solutions
-    #     for i in range(self.numCuckoos):
-    #         sol = self.initialSolution # Initialize Solution
-    #         self.nests.append(sol)
-        
-    #     for i in range(self.generations):   
-    #         # sort nests by cost
-    #         self.nests.sort(key = o.attrgetter('cost'))
-
-    #         # Search, and Evaluate with fraction Pc of Cuckoos of best cuckoos
-    #         PcNum = math.floor(self.numCuckoos * self.Pc)
-    #         for j in range(PcNum):
-    #             _levyNest = deepcopy(self.nests[j])
-    #             self.__performLevyFlights(_levyNest)
-               
-    #             # Randomly select a nest to compare with
-    #             _nestCompare = random.randrange(1, self.numCuckoos)
-
-    #             # If the generated solution is better than a randomly selected nest
-    #             if _levyNest.cost < self.nests[_nestCompare].cost:
-    #                 self.nests[_nestCompare] = deepcopy(_levyNest)
-            
-    #         # Abandon a fraction Pa of worse Cuckoos. Generate new random solutions for replacement
-    #         self.nests.sort(key = o.attrgetter('cost'), reverse=True)
-    #         PaNum = math.floor(self.numCuckoos * self.Pa)
-    #         # Compute probability of each nest to be abandoned except the best nest
-    #         for j in range(1, PaNum):
-    #             del self.nests[0] # Abandon nest
-    #             sol = self.initialSolution
-    #             self.nests.append(sol)
-
-    #         # Sort from best to worst and keep best solution
-    #         self.nests.sort(key = o.attrgetter('cost'))
-    #endregion
 
     #region original levy flight implementation, levy step = number of 2-opt
     def __generateLevyStep(self):
@@ -189,14 +122,14 @@ class CuckooSearch:
         #     self.__crossTwoOpt(nest)
         
         # Two Small Neighborhood
-        # smallStepChoice = random.choice([1,2])
-        # smallStepChoice = 1
-        # if smallStepChoice == 1:
-        #     for i in range(iterateNum):
-        #         self.__crossTwoOpt(nest)
-        # else:
-        #     for i in range(iterateNum):
-        #         self.__exchangeIntra(nest)
+        smallStepChoice = random.choice([1,2])
+        smallStepChoice = 1
+        if smallStepChoice == 1:
+            for i in range(iterateNum):
+                self.__crossTwoOpt(nest)
+        else:
+            for i in range(iterateNum):
+                self.__shift1(nest)
 
         # Two  Small Neighborhood and One Large
         # if iterateNum <= 4:
@@ -206,114 +139,19 @@ class CuckooSearch:
         #             self.__crossTwoOpt(nest)
         #     else:
         #         for i in range(iterateNum):
-        #             self.__shift1(nest)
+        #             self.__swap2_1(nest)
         # else:
         #     self.__swap2_2(nest)
 
         # One Small Neighborhood and One Large
-        if iterateNum <= 4:
-            for i in range(iterateNum):
-                self.__swap11(nest)
-        else:
-            self.__crossDoubleBridgeInter(nest)
+        # if iterateNum <= 4:
+        #     for i in range(iterateNum):
+        #         self.__swap11(nest)
+        # else:
+        #     self.__crossDoubleBridgeInter(nest)
 
     #endregion
-    #region gaussian implementation
-    # def __generateLevyStep(self):
-    #     """
-    #     In this implementation, a random value is generated from gaussian distribution
-    #     """
-    #     # mantegna's algorithm
-    #     stepsize = 5
-    #     steplength = np.random.normal(loc=0,scale=1)
-    #     step = stepsize*steplength
-    #     step = abs(step)
-        
-    #     return step
-
-    # def __performLevyFlights(self, nest):
-    #     # Generate random value x from levy 
-    #     # According to randomly generated value, perform 2-opt x time or double-bridge
-
-    #     # # temporary random num gen
-    #     # r = random.random()
-
-    #     r = self.__generateLevyStep()
-        
-    #     twoOptIter = (math.ceil(r))
-    #     doubleBridgeIter = 0
-        
-    #     for i in range(twoOptIter):
-    #         nest = self.__twoOptInter(nest)
-
-    #     for i in range(doubleBridgeIter):
-    #         nest = self.__doubleBridgeInter(nest)
-    #endregion
-    #region first implementation, range 0-5 of levy distrib considered. xiao
-    # def __generateLevyStep(self):
-    #     """
-    #     In this implementation, a random value is generated from levy distribution using mantegna's algorithms.
-    #     A levy flight will be generated as follows:
-
-    #     levy step
-    #     0 - 1, 0.2
-    #     1 - 2, 0.4
-    #     2 - 3, 0.6
-    #     3 - 4, 0.8
-    #     4 - 5, 1
-    #     """
-    #     # mantegna's algorithm
-    #     beta = 1
-    #     stepsize = 1
-    #     sigma = ((gamma(1 + beta)) * math.sin(math.pi*beta/2)) / ( beta * gamma((1+beta)/2) * math.pow(2,(beta-1)/2) )
-    #     u = np.random.normal(loc=0,scale=sigma)
-    #     v = np.random.normal(loc=0,scale=1)
-    #     steplength = u/ math.pow(abs(v),1/beta)
-    #     step = stepsize*steplength
-    #     step = abs(step)
-
-    #     # not mantegna's algorithm. I'm sure this ain't right tho
-    #     if step >= 0 and step <= 1:
-    #         return 0.2
-    #     elif step > 1 and step <= 2:
-    #         return 0.4
-    #     elif step > 2 and step <= 3:
-    #         return 0.6
-    #     elif step > 3 and step <= 4:
-    #         return 0.8
-    #     elif step > 4 and step <= 5:
-    #         return 1
-    #     else:
-    #         return 1
-
-    # def __performLevyFlights(self, nest):
-    #     # Generate random value x from levy 
-    #     # According to randomly generated value, perform 2-opt x time or double-bridge
-
-    #     # # temporary random num gen
-    #     # r = random.random()
-
-    #     r = self.__generateLevyStep()
-        
-    #     twoOptIter = 0
-    #     doubleBridgeIter = 0
-    #     if r >= 0 and r <= 0.2:
-    #         twoOptIter = 1
-    #     elif r > 0.2 and r <= 0.4:
-    #         twoOptIter = 2
-    #     elif r > 0.4 and r <= 0.6:
-    #         twoOptIter = 3
-    #     elif r > 0.6 and r <= 0.8:
-    #         twoOptIter = 4
-    #     elif r > 0.8 and r <= 1.0:
-    #         doubleBridgeIter = 1
-        
-    #     for i in range(twoOptIter):
-    #         nest = self.__twoOptInter(nest)
-
-    #     for i in range(doubleBridgeIter):
-    #         nest = self.__doubleBridgeInter(nest)
-    #endregion
+    
 
     #region neighborhood structures
     # the true twoOptInter
@@ -732,3 +570,166 @@ class CuckooSearch:
         }
         return str(string)
     
+    #region initialize with non-random heuristic, clarke-wright savings method
+    # def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
+    #     self.instance = CVRPInstance
+    #     self.Pa = Pa
+    #     self.Pc = Pc
+    #     self.generations = generations
+    #     self.pdf_type = pdf_type
+    #     self.numCuckoos = numCuckoos
+    #     self.nests = []
+    #     self.numFailedAttemptsLevyLimit = 1
+    #     random.seed()
+    #     self.initialSolution = self.instance.create_random_solution()
+
+    #     start = timer()
+    #     self.solveInstance()
+    #     end = timer()
+    #     self.time = str("{0:.2f}".format(end - start)) 
+        
+    #     lenRoute = 0
+    #     for route in self.nests[0].routes:
+    #         lenRoute += len(route.route) - 2
+
+    #     print('Dataset: ' + self.instance.fileName 
+    #         + ', Optimal Value: ' + str(self.instance.optimalValue)
+    #         + ', Best Solution Cost: ' + str(self.nests[0].cost)
+    #         + ', clarkeSol: ' + str(self.initialSolution.cost)
+    #         + ', Run time: ' + self.time 
+    #         + ', routesGen(gen, min) = ' + str(len(self.nests[0].routes)) 
+    #         + ', ' + str(self.instance.minNumVehicles))
+    #         # ' numNodes(gen, req) = ' + str(lenRoute+1) + ', ' + str(self.instance.dimension))
+
+    # def solveInstance(self):
+    #     # Initialize Solutions
+    #     for i in range(self.numCuckoos):
+    #         sol = self.initialSolution # Initialize Solution
+    #         self.nests.append(sol)
+        
+    #     for i in range(self.generations):   
+    #         # sort nests by cost
+    #         self.nests.sort(key = o.attrgetter('cost'))
+
+    #         # Search, and Evaluate with fraction Pc of Cuckoos of best cuckoos
+    #         PcNum = math.floor(self.numCuckoos * self.Pc)
+    #         for j in range(PcNum):
+    #             _levyNest = deepcopy(self.nests[j])
+    #             self.__performLevyFlights(_levyNest)
+               
+    #             # Randomly select a nest to compare with
+    #             _nestCompare = random.randrange(1, self.numCuckoos)
+
+    #             # If the generated solution is better than a randomly selected nest
+    #             if _levyNest.cost < self.nests[_nestCompare].cost:
+    #                 self.nests[_nestCompare] = deepcopy(_levyNest)
+            
+    #         # Abandon a fraction Pa of worse Cuckoos. Generate new random solutions for replacement
+    #         self.nests.sort(key = o.attrgetter('cost'), reverse=True)
+    #         PaNum = math.floor(self.numCuckoos * self.Pa)
+    #         # Compute probability of each nest to be abandoned except the best nest
+    #         for j in range(1, PaNum):
+    #             del self.nests[0] # Abandon nest
+    #             sol = self.initialSolution
+    #             self.nests.append(sol)
+
+    #         # Sort from best to worst and keep best solution
+    #         self.nests.sort(key = o.attrgetter('cost'))
+    #endregion
+
+    #region gaussian implementation
+    # def __generateLevyStep(self):
+    #     """
+    #     In this implementation, a random value is generated from gaussian distribution
+    #     """
+    #     # mantegna's algorithm
+    #     stepsize = 5
+    #     steplength = np.random.normal(loc=0,scale=1)
+    #     step = stepsize*steplength
+    #     step = abs(step)
+        
+    #     return step
+
+    # def __performLevyFlights(self, nest):
+    #     # Generate random value x from levy 
+    #     # According to randomly generated value, perform 2-opt x time or double-bridge
+
+    #     # # temporary random num gen
+    #     # r = random.random()
+
+    #     r = self.__generateLevyStep()
+        
+    #     twoOptIter = (math.ceil(r))
+    #     doubleBridgeIter = 0
+        
+    #     for i in range(twoOptIter):
+    #         nest = self.__twoOptInter(nest)
+
+    #     for i in range(doubleBridgeIter):
+    #         nest = self.__doubleBridgeInter(nest)
+    #endregion
+    #region first implementation, range 0-5 of levy distrib considered. xiao
+    # def __generateLevyStep(self):
+    #     """
+    #     In this implementation, a random value is generated from levy distribution using mantegna's algorithms.
+    #     A levy flight will be generated as follows:
+
+    #     levy step
+    #     0 - 1, 0.2
+    #     1 - 2, 0.4
+    #     2 - 3, 0.6
+    #     3 - 4, 0.8
+    #     4 - 5, 1
+    #     """
+    #     # mantegna's algorithm
+    #     beta = 1
+    #     stepsize = 1
+    #     sigma = ((gamma(1 + beta)) * math.sin(math.pi*beta/2)) / ( beta * gamma((1+beta)/2) * math.pow(2,(beta-1)/2) )
+    #     u = np.random.normal(loc=0,scale=sigma)
+    #     v = np.random.normal(loc=0,scale=1)
+    #     steplength = u/ math.pow(abs(v),1/beta)
+    #     step = stepsize*steplength
+    #     step = abs(step)
+
+    #     # not mantegna's algorithm. I'm sure this ain't right tho
+    #     if step >= 0 and step <= 1:
+    #         return 0.2
+    #     elif step > 1 and step <= 2:
+    #         return 0.4
+    #     elif step > 2 and step <= 3:
+    #         return 0.6
+    #     elif step > 3 and step <= 4:
+    #         return 0.8
+    #     elif step > 4 and step <= 5:
+    #         return 1
+    #     else:
+    #         return 1
+
+    # def __performLevyFlights(self, nest):
+    #     # Generate random value x from levy 
+    #     # According to randomly generated value, perform 2-opt x time or double-bridge
+
+    #     # # temporary random num gen
+    #     # r = random.random()
+
+    #     r = self.__generateLevyStep()
+        
+    #     twoOptIter = 0
+    #     doubleBridgeIter = 0
+    #     if r >= 0 and r <= 0.2:
+    #         twoOptIter = 1
+    #     elif r > 0.2 and r <= 0.4:
+    #         twoOptIter = 2
+    #     elif r > 0.4 and r <= 0.6:
+    #         twoOptIter = 3
+    #     elif r > 0.6 and r <= 0.8:
+    #         twoOptIter = 4
+    #     elif r > 0.8 and r <= 1.0:
+    #         doubleBridgeIter = 1
+        
+    #     for i in range(twoOptIter):
+    #         nest = self.__twoOptInter(nest)
+
+    #     for i in range(doubleBridgeIter):
+    #         nest = self.__doubleBridgeInter(nest)
+    #endregion
