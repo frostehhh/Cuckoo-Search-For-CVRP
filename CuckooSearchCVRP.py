@@ -123,13 +123,12 @@ class CuckooSearch:
         
         # Two Small Neighborhood
         smallStepChoice = random.choice([1,2])
-        smallStepChoice = 1
         if smallStepChoice == 1:
             for i in range(iterateNum):
                 self.__crossTwoOpt(nest)
         else:
             for i in range(iterateNum):
-                self.__shift1(nest)
+                self.__exchangeIntra(nest)
 
         # Two  Small Neighborhood and One Large
         # if iterateNum <= 4:
@@ -139,7 +138,7 @@ class CuckooSearch:
         #             self.__crossTwoOpt(nest)
         #     else:
         #         for i in range(iterateNum):
-        #             self.__swap2_1(nest)
+        #             self.__reinsertionIntra(nest)
         # else:
         #     self.__swap2_2(nest)
 
