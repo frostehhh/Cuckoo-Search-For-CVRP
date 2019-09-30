@@ -119,7 +119,7 @@ class CuckooSearch:
 
         # One Small Neighborhood
         for i in range(iterateNum):
-            self.__crossTwoOpt(nest)
+            self.__shift1(nest)
         
         # Two Small Neighborhood
         # smallStepChoice = random.choice([1,2])
