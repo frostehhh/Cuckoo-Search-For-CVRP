@@ -25,15 +25,15 @@ FinalResultsPath = 'finalresults/'
 numNests = 15
 Pa = 0.25 # Fraction of worse solutions to be replaced
 Pc = 0.6 # Fraction of cuckoos performing Levy Flights
-maxGenerations = 11# maximum number of iterations
+maxGenerations = 1000# maximum number of iterations
 stopCriterion = maxGenerations # attempt limit of successive iterations
 
 print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' + str(Pc) +
 ' maxGenerations: ' + str(maxGenerations) + ' stopCriterion = ' + str(stopCriterion))
 
 #region iterate 30 times
-numIter = 2
-fileNameSuffix = 'crossTwoOpt_levy6'
+numIter = 30
+fileNameSuffix = 'twoOpt_orOpt3_5050_levy6'
 
 experimentData = exp.initializeExperimentData()
 instanceData = exp.initializeInstanceData()
