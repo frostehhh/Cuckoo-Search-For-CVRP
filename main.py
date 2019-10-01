@@ -33,7 +33,7 @@ print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' 
 
 #region iterate 30 times
 numIter = 30
-fileNameSuffix = 'swap21_doubleBridge_levy4_levy5'
+fileNameSuffix = 'twoOpt_reinsertion_swap22_levy4_levy5'
 
 experimentData = exp.initializeExperimentData()
 instanceData = exp.initializeInstanceData()
