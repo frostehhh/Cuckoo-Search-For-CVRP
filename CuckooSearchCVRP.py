@@ -143,11 +143,11 @@ class CuckooSearch:
         #     self.__swap2_2(nest)
 
         # One Small Neighborhood and One Large
-        # if iterateNum <= 4:
-        #     for i in range(iterateNum):
-        #         self.__swap11(nest)
-        # else:
-        #     self.__crossDoubleBridgeInter(nest)
+        if iterateNum <= 4:
+            for i in range(iterateNum):
+                self.__swap2_1(nest)
+        else:
+            self.__crossDoubleBridgeInter(nest)
 
     #endregion
     
