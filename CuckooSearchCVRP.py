@@ -34,7 +34,6 @@ class CuckooSearch:
         self.Pa = Pa
         self.Pc = Pc
         self.generations = generations
-        self.pdf_type = pdf_type
         self.numCuckoos = numCuckoos
         self.nests = []
         self.numFailedAttemptsLevyLimit = 1
