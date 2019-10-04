@@ -25,66 +25,66 @@ FinalResultsPath = 'finalresults/'
 numNests = 15
 Pa = 0.25 # Fraction of worse solutions to be replaced
 Pc = 0.6 # Fraction of cuckoos performing Levy Flights
-maxGenerations = 1000# maximum number of iterations
+maxGenerations = 30000# maximum number of iterations
 stopCriterion = maxGenerations # attempt limit of successive iterations
 
 print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' + str(Pc) +
 ' maxGenerations: ' + str(maxGenerations) + ' stopCriterion = ' + str(stopCriterion))
 
 #region iterate 30 times
-numIter = 30
-fileNameSuffix = 'twoOpt_reinsertion_swap22_levy4_levy5'
+# numIter = 30
+# fileNameSuffix = 'twoOpt_reinsertion_swap22_levy4_levy5'
 
-experimentData = exp.initializeExperimentData()
-instanceData = exp.initializeInstanceData()
-for dataset in DataSetA:
-        instanceData = exp.initializeInstanceData()
-        for i in range(numIter):
-                CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-                solver.solveInstance()
-                exp.appendRowToInstanceDf(instanceData, solver.readData())
-        row = exp.calculateInstanceResults(instanceData)
-        exp.appendRowToExperimentDf(experimentData, row)
-# exp.saveResultsToCsv(experimentData, FinalResultsSetAPath, fileNameSuffix, type='finalresults')
+# experimentData = exp.initializeExperimentData()
+# instanceData = exp.initializeInstanceData()
+# for dataset in DataSetA:
+#         instanceData = exp.initializeInstanceData()
+#         for i in range(numIter):
+#                 CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
+#                 solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+#                 solver.solveInstance()
+#                 exp.appendRowToInstanceDf(instanceData, solver.readData())
+#         row = exp.calculateInstanceResults(instanceData)
+#         exp.appendRowToExperimentDf(experimentData, row)
+# # exp.saveResultsToCsv(experimentData, FinalResultsSetAPath, fileNameSuffix, type='finalresults')
 
-for dataset in DataSetB:
-        instanceData = exp.initializeInstanceData()
-        for i in range(numIter):
-                CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-                solver.solveInstance()
-                exp.appendRowToInstanceDf(instanceData, solver.readData())
-        row = exp.calculateInstanceResults(instanceData)
-        exp.appendRowToExperimentDf(experimentData, row)
-# exp.saveResultsToCsv(experimentData, FinalResultsSetBPath, fileNameSuffix, type='finalresults')
+# for dataset in DataSetB:
+#         instanceData = exp.initializeInstanceData()
+#         for i in range(numIter):
+#                 CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
+#                 solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+#                 solver.solveInstance()
+#                 exp.appendRowToInstanceDf(instanceData, solver.readData())
+#         row = exp.calculateInstanceResults(instanceData)
+#         exp.appendRowToExperimentDf(experimentData, row)
+# # exp.saveResultsToCsv(experimentData, FinalResultsSetBPath, fileNameSuffix, type='finalresults')
 
 
-for dataset in DataSetP:
-        instanceData = exp.initializeInstanceData()
-        for i in range(numIter):
-                CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-                solver.solveInstance()
-                exp.appendRowToInstanceDf(instanceData, solver.readData())
-        row = exp.calculateInstanceResults(instanceData)
-        exp.appendRowToExperimentDf(experimentData, row)
-# exp.saveResultsToCsv(experimentData, FinalResultsSetPPath, fileNameSuffix, type='finalresults')
-exp.saveResultsToCsv(experimentData, FinalResultsPath, fileNameSuffix, type='complete')
+# for dataset in DataSetP:
+#         instanceData = exp.initializeInstanceData()
+#         for i in range(numIter):
+#                 CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
+#                 solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+#                 solver.solveInstance()
+#                 exp.appendRowToInstanceDf(instanceData, solver.readData())
+#         row = exp.calculateInstanceResults(instanceData)
+#         exp.appendRowToExperimentDf(experimentData, row)
+# # exp.saveResultsToCsv(experimentData, FinalResultsSetPPath, fileNameSuffix, type='finalresults')
+# exp.saveResultsToCsv(experimentData, FinalResultsPath, fileNameSuffix, type='complete')
 
 
 #endregion
 
 #region iterate once
-# fileNameSuffix = 'twoOpt_shift1_swap22_5050_levy4_levy5'
-# data = []
-# data = exp.initializeInstanceData()
-# for dataset in DataSetA:
-#         CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         exp.appendRowToInstanceDf(data, solver.readData())
-# # exp.saveResultsToCsv(data, ResultsSetAPath, fileNameSuffix)
+fileNameSuffix = 'crossTwoOpt_reinsertion_swap22_5050_levy4_levy5_30000'
+data = []
+data = exp.initializeInstanceData()
+for dataset in DataSetA:
+        CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
+        solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+        solver.solveInstance()
+        exp.appendRowToInstanceDf(data, solver.readData())
+# exp.saveResultsToCsv(data, ResultsSetAPath, fileNameSuffix)
 
 # for dataset in DataSetB:
 #         CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
@@ -98,6 +98,6 @@ exp.saveResultsToCsv(experimentData, FinalResultsPath, fileNameSuffix, type='com
 #         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
 #         solver.solveInstance()
 #         exp.appendRowToInstanceDf(data, solver.readData())
-# exp.saveResultsToCsv(data, ResultsPath, fileNameSuffix, type='results')
+exp.saveResultsToCsv(data, ResultsPath, fileNameSuffix, type='results')
 #endregion
 
