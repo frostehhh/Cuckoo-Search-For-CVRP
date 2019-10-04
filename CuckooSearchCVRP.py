@@ -29,7 +29,7 @@ class CuckooSearch:
     """
 
     #region initialize with random solution
-    def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
+    def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000):
         self.instance = CVRPInstance
         self.Pa = Pa
         self.Pc = Pc
