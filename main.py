@@ -170,4 +170,30 @@ combiType = LevyCombinationTypes.SMALL_2_LARGE_1
 listNeighbor = [n.SWAP11, n.REINSERTION, n.DOUBLE_BRIDGE]
 fileName = 'twoOpt_reinsertion_doubleBridge_5050_levy4_levy5_500iter'
 CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP11, n.EXCHANGE]
+fileName = 'twoOpt_exchange_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP11, n.OR_OPT3]
+fileName = 'twoOpt_orOpt3_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.TWOOPT, n.SHIFT1]
+fileName = 'crossTwoOpt_shift1_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.TWOOPT, n.REINSERTION]
+fileName = 'crossTwoOpt_reinsertion_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_1_LARGE_1
+listNeighbor = [n.SWAP11, n.DOUBLE_BRIDGE]
+fileName = 'twoOpt_doubleBridge_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
 #endregion
