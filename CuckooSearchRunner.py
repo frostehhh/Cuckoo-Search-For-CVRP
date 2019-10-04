@@ -28,7 +28,7 @@ class CSRunner:
         numNests = 15
         Pa = 0.25 # Fraction of worse solutions to be replaced
         Pc = 0.6 # Fraction of cuckoos performing Levy Flights
-        maxGenerations = 1# maximum number of iterations
+        maxGenerations = 500# maximum number of iterations
         stopCriterion = maxGenerations # attempt limit of successive iterations
 
         
@@ -44,7 +44,7 @@ class CSRunner:
                 ' maxGenerations: ' + str(self.maxGenerations) + ' stopCriterion = ' + str(self.stopCriterion))
 
                 #region iterate 30 times
-                numIter = 2
+                numIter = 30
 
                 experimentData = exp.initializeExperimentData()
                 instanceData = exp.initializeInstanceData()
