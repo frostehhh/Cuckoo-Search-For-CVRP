@@ -8,7 +8,7 @@ from copy import deepcopy
 from scipy.stats import levy
 from scipy.special import gamma
 from numpy.random import RandomState
-
+from enum import Enum
 
 
 class CuckooSearch:
@@ -26,18 +26,24 @@ class CuckooSearch:
 
     For Levy flights, Mantegna's algorithm was used. 
     
+    combinationType = LevyCombinationTypes.SMALL_2_LARGE_1
+    neighborhoods = [Neighborhoods.OR_OPT3]
     """
 
     #region initialize with random solution
-    def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
+    def __init__(self, CVRPInstance, numCuckoos = 15, Pa = 0.2, Pc = 0.6, generations = 500
+                    ,combinationType = None, neighborhoods = None):
         self.instance = CVRPInstance
         self.Pa = Pa
         self.Pc = Pc
         self.generations = generations
-        self.pdf_type = pdf_type
         self.numCuckoos = numCuckoos
         self.nests = []
         self.numFailedAttemptsLevyLimit = 1
+        self.combinationType = combinationType
+        self.neighborhoods = neighborhoods
+        self.levyNeighborhoods = self.__setNeighborhoods()
+        self.performLevyFlights = self.__setLevyFlights() 
         random.seed()
 
         start = timer()
@@ -69,7 +75,8 @@ class CuckooSearch:
             PcNum = math.floor(self.numCuckoos * self.Pc)
             for j in range(PcNum):
                 _levyNest = deepcopy(self.nests[j])
-                self.__performLevyFlights(_levyNest)
+                # self.__performLevyFlights(_levyNest)
+                self.performLevyFlights(_levyNest)
                
                 # Randomly select a nest to compare with
                 _nestCompare = random.randrange(1, self.numCuckoos)
@@ -91,11 +98,49 @@ class CuckooSearch:
             self.nests.sort(key = o.attrgetter('cost'))
     #endregion
 
-    #region original levy flight implementation, levy step = number of 2-opt
-    def __generateLevyStep(self):
+    def __setLevyFlights(self):
+        if self.combinationType == LevyCombinationTypes.SMALL_1:
+            return self.__levy_small1
+        elif self.combinationType == LevyCombinationTypes.SMALL_2:
+            return self.__levy_small2
+        elif self.combinationType == LevyCombinationTypes.SMALL_1_LARGE_1:
+            return self.__levy_small1_large1
+        elif self.combinationType == LevyCombinationTypes.SMALL_2_LARGE_1:
+            return self.__levy_small2_large1
+
+    def __setNeighborhoods(self):
+        z = []
+        copyNeigh  = self.neighborhoods[:]
+        while copyNeigh:
+            n = copyNeigh[0]
+            if n == Neighborhoods.SHIFT1:
+                z.append(self.__shift1)
+            elif n == Neighborhoods.SHIFT2:
+                z.append(self.__shift2)
+            elif n == Neighborhoods.SWAP11:
+                z.append(self.__swap11)
+            elif n == Neighborhoods.SWAP21:
+                z.append(self.__swap2_1)
+            elif n == Neighborhoods.SWAP22:
+                z.append(self.__swap2_2)
+            elif n == Neighborhoods.TWOOPT:
+                z.append(self.__crossTwoOpt)
+            elif n == Neighborhoods.DOUBLE_BRIDGE:
+                z.append(self.__crossDoubleBridgeInter)
+            elif n == Neighborhoods.REINSERTION:
+                z.append(self.__reinsertionIntra)
+            elif n == Neighborhoods.EXCHANGE:
+                z.append(self.__exchangeIntra)
+            elif n == Neighborhoods.OR_OPT2:
+                z.append(self.__orOpt2)
+            elif n == Neighborhoods.OR_OPT3:
+                z.append(self.__orOpt3)
+            del copyNeigh[0]
+        return z
+        
+    def __generateLevyStep(self, limit = None):
         """
         In this implementation, a random value is generated from levy distribution using mantegna's algorithms.
-
         """
         # mantegna's algorithm
         beta = 1
@@ -104,54 +149,55 @@ class CuckooSearch:
         v = np.random.normal(loc=0,scale=1)
         steplength = u/ math.pow(abs(v),1/beta)
         
+        steplength = math.ceil(abs(steplength))
+
+        self.__checkLevyBounds(steplength, limit)
         return steplength
 
-    def __performLevyFlights(self, nest):
-        # Generate random value x from levy 
-        # According to randomly generated value, perform 2-opt x time or double-bridge
-        r = self.__generateLevyStep()
-        r = abs(r)
-        iterateNum = math.ceil(r)
+    def __checkLevyBounds(self, x, limit):
+        if x > limit:
+            x = limit
 
-        upperBound = 6
-        if iterateNum > upperBound:
-            iterateNum = upperBound
+    def __levy_small1(self, nest):
+        r = self.__generateLevyStep(limit=6)
 
-        # One Small Neighborhood
-        for i in range(iterateNum):
-            self.__shift1(nest)
+        for i in range(r):
+            self.levyNeighborhoods[0](nest)
+
+    def __levy_small2(self, nest):
+        r = self.__generateLevyStep(limit=6)
+
+        smallStepChoice = random.choice([1,2])
+        if smallStepChoice == 1:
+            for i in range(r):
+                self.levyNeighborhoods[0](nest)
+        else:
+            for i in range(r):
+                self.levyNeighborhoods[1](nest)
+
+    def __levy_small1_large1(self, nest):
+        r = self.__generateLevyStep(limit=5)
         
-        # Two Small Neighborhood
-        # smallStepChoice = random.choice([1,2])
-        # if smallStepChoice == 1:
-        #     for i in range(iterateNum):
-        #         self.__crossTwoOpt(nest)
-        # else:
-        #     for i in range(iterateNum):
-        #         self.__swap2_1(nest)
+        if r <= 4:
+            for i in range(r):
+                self.levyNeighborhoods[0](nest)
+        else:
+            self.levyNeighborhoods[1](nest)
 
-        # Two  Small Neighborhood and One Large
-        # if iterateNum <= 4:
-        #     smallStepChoice = random.choice([1,2])
-        #     if smallStepChoice == 1:
-        #         for i in range(iterateNum):
-        #             self.__crossTwoOpt(nest)
-        #     else:
-        #         for i in range(iterateNum):
-        #             self.__reinsertionIntra(nest)
-        # else:
-        #     self.__swap2_2(nest)
+    def __levy_small2_large1(self, nest):
+        r = self.__generateLevyStep(limit=5)
 
-        # One Small Neighborhood and One Large
-        # if iterateNum <= 4:
-        #     for i in range(iterateNum):
-        #         self.__swap2_1(nest)
-        # else:
-        #     self.__crossDoubleBridgeInter(nest)
-
-    #endregion
+        if r <= 4:
+            smallStepChoice = random.choice([1,2])
+            if smallStepChoice == 1:
+                for i in range(r):
+                    self.levyNeighborhoods[0](nest)
+            else:
+                for i in range(r):
+                    self.levyNeighborhoods[1](nest)
+        else:
+            self.levyNeighborhoods[2](nest)
     
-
     #region neighborhood structures
     # the true twoOptInter
     def __crossTwoOpt(self,sol):
@@ -389,7 +435,7 @@ class CuckooSearch:
             if _solr1.demand <= self.instance.capacity:
                 if _solr2.demand <= self.instance.capacity:
                     if _solr3.demand <= self.instance.capacity:
-                       if _solr4.demand <= self.instance.capacity:
+                        if _solr4.demand <= self.instance.capacity:
                             sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
                             sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
                             sol.routes[rRouteIdx[2]] = deepcopy(_solr3)
@@ -545,7 +591,6 @@ class CuckooSearch:
             self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
             self.instance.recalculate_solution_cost(sol)
     #endregion
-    
 
     def readData(self):
         data = {
@@ -635,7 +680,6 @@ class CuckooSearch:
     #         # Sort from best to worst and keep best solution
     #         self.nests.sort(key = o.attrgetter('cost'))
     #endregion
-
     #region gaussian implementation
     # def __generateLevyStep(self):
     #     """
@@ -732,3 +776,22 @@ class CuckooSearch:
     #     for i in range(doubleBridgeIter):
     #         nest = self.__doubleBridgeInter(nest)
     #endregion
+
+class LevyCombinationTypes(Enum):
+    SMALL_1 = 1
+    SMALL_2 = 2
+    SMALL_1_LARGE_1 = 3
+    SMALL_2_LARGE_1 = 4
+
+class Neighborhoods(Enum):
+    SHIFT1 = 1
+    SHIFT2 = 2
+    SWAP11 = 3
+    SWAP21 = 4
+    SWAP22 = 5
+    TWOOPT = 6
+    DOUBLE_BRIDGE = 7
+    REINSERTION = 8
+    OR_OPT2 = 9
+    OR_OPT3 = 10
+    EXCHANGE = 11

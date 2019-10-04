@@ -1,103 +1,173 @@
-import pandas as pd
-import os
-import Parser as p
-import experiment as exp
-from CVRP import CVRPInfo as CVRP
-from CuckooSearchCVRP import CuckooSearch
+from CuckooSearchRunner import CSRunner
+from CuckooSearchCVRP import LevyCombinationTypes
+from CuckooSearchCVRP import Neighborhoods as n
 
-experimentData = []
-instanceData = []
+#region running on main pc
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.TWOOPT, n.EXCHANGE]
+fileName = 'crossTwoOpt_exchange_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-#region Load Datasets
-DataSetAPath = 'data/A-VRP/'
-DataSetBPath = 'data/B-VRP/'
-DataSetPPath = 'data/P-VRP/'
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.TWOOPT, n.SHIFT1, n.SWAP22]
+fileName = 'crossTwoOpt_shift1_swap22_5050_levy4_levy5_500iter'
 
-DataSetA = os.listdir(DataSetAPath) # list of file names of benchmark instances from Set A
-DataSetB = os.listdir(DataSetBPath) # list of file names of benchmark instances from Set B
-DataSetP = os.listdir(DataSetPPath) # list of file names of benchmark instances from Set P
-#end region
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.SWAP21, n.SHIFT1, n.SWAP22]
+fileName = 'swap21_shift1_swap22_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-ResultsPath = 'results/'
-FinalResultsPath = 'finalresults/'
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.SWAP21, n.REINSERTION, n.SWAP22]
+fileName = 'swap21_reinsertion_swap22_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-#Initialize Cuckoo SearchParameters
-numNests = 15
-Pa = 0.25 # Fraction of worse solutions to be replaced
-Pc = 0.6 # Fraction of cuckoos performing Levy Flights
-maxGenerations = 500# maximum number of iterations
-stopCriterion = maxGenerations # attempt limit of successive iterations
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP21, n.SHIFT1]
+fileName = 'swap21_shift1_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' + str(Pc) +
-' maxGenerations: ' + str(maxGenerations) + ' stopCriterion = ' + str(stopCriterion))
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.SWAP11, n.SHIFT1, n.SWAP22]
+fileName = 'twoOpt_shift1_swap22_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-#region iterate 30 times
-numIter = 30
-fileNameSuffix = 'twoOpt_reinsertion_swap22_levy4_levy5'
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.SWAP11, n.REINSERTION, n.SWAP22]
+fileName = 'twoOpt_reinsertion_swap22_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-experimentData = exp.initializeExperimentData()
-instanceData = exp.initializeInstanceData()
-for dataset in DataSetA:
-        instanceData = exp.initializeInstanceData()
-        for i in range(numIter):
-                CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-                solver.solveInstance()
-                exp.appendRowToInstanceDf(instanceData, solver.readData())
-        row = exp.calculateInstanceResults(instanceData)
-        exp.appendRowToExperimentDf(experimentData, row)
-# exp.saveResultsToCsv(experimentData, FinalResultsSetAPath, fileNameSuffix, type='finalresults')
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.SWAP21, n.SHIFT1, n.DOUBLE_BRIDGE]
+fileName = 'swap21_shift1_doubleBridge_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-for dataset in DataSetB:
-        instanceData = exp.initializeInstanceData()
-        for i in range(numIter):
-                CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-                solver.solveInstance()
-                exp.appendRowToInstanceDf(instanceData, solver.readData())
-        row = exp.calculateInstanceResults(instanceData)
-        exp.appendRowToExperimentDf(experimentData, row)
-# exp.saveResultsToCsv(experimentData, FinalResultsSetBPath, fileNameSuffix, type='finalresults')
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP21, n.REINSERTION]
+fileName = 'swap21_reinsertion_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.SWAP11, n.SHIFT1, n.DOUBLE_BRIDGE]
+fileName = 'twoOpt_shift1_doubleBridge_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-for dataset in DataSetP:
-        instanceData = exp.initializeInstanceData()
-        for i in range(numIter):
-                CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-                solver.solveInstance()
-                exp.appendRowToInstanceDf(instanceData, solver.readData())
-        row = exp.calculateInstanceResults(instanceData)
-        exp.appendRowToExperimentDf(experimentData, row)
-# exp.saveResultsToCsv(experimentData, FinalResultsSetPPath, fileNameSuffix, type='finalresults')
-exp.saveResultsToCsv(experimentData, FinalResultsPath, fileNameSuffix, type='finalresults')
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.SWAP21, n.REINSERTION, n.DOUBLE_BRIDGE]
+fileName = 'swap21_reinsertion_doubleBridge_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP21, n.EXCHANGE]
+fileName = 'swap21_exchange_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP11, n.SHIFT1]
+fileName = 'twoOpt_shift1_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_1_LARGE_1
+listNeighbor = [n.SWAP21, n.DOUBLE_BRIDGE]
+fileName = 'swap21_doubleBridge_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 #endregion
 
-#region iterate once
-# fileNameSuffix = 'crossTwoOpt_reinsertion_swap22_5050_levy4_levy5_30000'
-# data = []
-# data = exp.initializeInstanceData()
-# for dataset in DataSetA:
-#         CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         exp.appendRowToInstanceDf(data, solver.readData())
-# exp.saveResultsToCsv(data, ResultsSetAPath, fileNameSuffix)
+#region running on 2nd pc
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP11, n.OR_OPT2]
+fileName = 'twoOpt_orOpt2_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-# for dataset in DataSetB:
-#         CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         exp.appendRowToInstanceDf(data, solver.readData())
-# # exp.saveResultsToCsv(data, ResultsSetBPath, fileNameSuffix)
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP21, n.OR_OPT2]
+fileName = 'swap21_orOpt2_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 
-# for dataset in DataSetP:
-#         CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         exp.appendRowToInstanceDf(data, solver.readData())
-# exp.saveResultsToCsv(data, ResultsPath, fileNameSuffix, type='results')
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP11, n.SHIFT2]
+fileName = 'twoOpt_shift2_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP11, n.SWAP21]
+fileName = 'twoOpt_swap21_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.SWAP11, n.SWAP21, n.DOUBLE_BRIDGE]
+fileName = 'twoOpt_swap21_doubleBridge_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.TWOOPT, n.SWAP21, n.SWAP22]
+fileName = 'crossTwoOpt_swap21_swap22_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.TWOOPT, n.OR_OPT3]
+fileName = 'crossTwoOpt_orOpt3_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.TWOOPT, n.SWAP21]
+fileName = 'crossTwoOpt_swap21_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP21, n.SHIFT2]
+fileName = 'swap21_shift2_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.TWOOPT, n.SWAP21, n.DOUBLE_BRIDGE]
+fileName = 'crossTwoOpt_swap21_doubleBridge_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_1_LARGE_1
+listNeighbor = [n.SWAP21, n.SWAP22]
+fileName = 'swap21_swap22_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
 #endregion
 
+#region run on camille pc
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP21, n.OR_OPT3]
+fileName = 'swap21_orOpt3_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.TWOOPT, n.SHIFT2]
+fileName = 'crossTwoOpt_shift2_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_1_LARGE_1
+listNeighbor = [n.SWAP11, n.SWAP22]
+fileName = 'twoOpt_swap22_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_1_LARGE_1
+listNeighbor = [n.TWOOPT, n.SWAP22]
+fileName = 'crossTwoOpt_swap22_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_1
+listNeighbor = [n.SHIFT1]
+fileName = 'shift1_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2
+listNeighbor = [n.SWAP11, n.REINSERTION]
+fileName = 'twoOpt_reinsertion_5050_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_1
+listNeighbor = [n.SWAP21]
+fileName = 'swap21_levy6_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+
+combiType = LevyCombinationTypes.SMALL_2_LARGE_1
+listNeighbor = [n.SWAP11, n.REINSERTION, n.DOUBLE_BRIDGE]
+fileName = 'twoOpt_reinsertion_doubleBridge_5050_levy4_levy5_500iter'
+CSRunner(combiType, listNeighbor, fileName)
+#endregion
