@@ -29,7 +29,7 @@ class CuckooSearch:
     """
 
     #region initialize with random solution
-    def __init__(self, CVRPInstance, numCuckoos = 20, Pa = 0.2, Pc = 0.6, generations = 5000, pdf_type = 'levy'):
+    def __init__(self, CVRPInstance, numCuckoos = 15, Pa = 0.25, Pc = 0.6, generations = 500, pdf_type = 'levy'):
         self.instance = CVRPInstance
         self.Pa = Pa
         self.Pc = Pc
@@ -122,25 +122,25 @@ class CuckooSearch:
         #     self.__shift1(nest)
         
         # Two Small Neighborhood
-        # smallStepChoice = random.choice([1,2])
-        # if smallStepChoice == 1:
-        #     for i in range(iterateNum):
-        #         self.__crossTwoOpt(nest)
-        # else:
-        #     for i in range(iterateNum):
-        #         self.__swap2_1(nest)
+        smallStepChoice = random.choice([1,2])
+        if smallStepChoice == 1:
+            for i in range(iterateNum):
+                self.__crossTwoOpt(nest)
+        else:
+            for i in range(iterateNum):
+                self.__exchangeIntra(nest)
 
         # Two  Small Neighborhood and One Large
-        if iterateNum <= 4:
-            smallStepChoice = random.choice([1,2])
-            if smallStepChoice == 1:
-                for i in range(iterateNum):
-                    self.__crossTwoOpt(nest)
-            else:
-                for i in range(iterateNum):
-                    self.__reinsertionIntra(nest)
-        else:
-            self.__crossDoubleBridgeInter(nest)
+        # if iterateNum <= 4:
+        #     smallStepChoice = random.choice([1,2])
+        #     if smallStepChoice == 1:
+        #         for i in range(iterateNum):
+        #             self.__crossTwoOpt(nest)
+        #     else:
+        #         for i in range(iterateNum):
+        #             self.__reinsertionIntra(nest)
+        # else:
+        #     self.__crossDoubleBridgeInter(nest)
 
         # One Small Neighborhood and One Large
         # if iterateNum <= 4:
