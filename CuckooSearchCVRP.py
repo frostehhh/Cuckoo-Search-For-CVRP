@@ -191,12 +191,13 @@ class CuckooSearch:
             self.instance.recalculate_route_demand_cost(_solr1)
             self.instance.recalculate_route_demand_cost(_solr2)
 
-            if _solr1.demand <= self.instance.capacity:
-                if _solr2.demand <= self.instance.capacity:
-                    sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
-                    sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
-                    self.instance.recalculate_solution_cost(sol)
-                    break
+            if (_solr1.demand <= self.instance.capacity and
+                _solr2.demand <= self.instance.capacity
+                ):
+                sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
+                sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
+                self.instance.recalculate_solution_cost(sol)
+                break
             
             numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
@@ -236,12 +237,13 @@ class CuckooSearch:
             self.instance.recalculate_route_demand_cost(_solr1)
             self.instance.recalculate_route_demand_cost(_solr2)
 
-            if _solr1.demand <= self.instance.capacity:
-                if _solr2.demand <= self.instance.capacity:
-                    sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
-                    sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
-                    self.instance.recalculate_solution_cost(sol)
-                    break
+            if (_solr1.demand <= self.instance.capacity and
+                _solr2.demand <= self.instance.capacity
+                ):
+                sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
+                sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
+                self.instance.recalculate_solution_cost(sol)
+                break
             
             numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
@@ -280,12 +282,13 @@ class CuckooSearch:
             self.instance.recalculate_route_demand_cost(_solr1)
             self.instance.recalculate_route_demand_cost(_solr2)
 
-            if _solr1.demand <= self.instance.capacity:
-                if _solr2.demand <= self.instance.capacity:
-                    sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
-                    sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
-                    self.instance.recalculate_solution_cost(sol)
-                    break
+            if (_solr1.demand <= self.instance.capacity and
+                _solr2.demand <= self.instance.capacity
+                ):
+                sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
+                sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
+                self.instance.recalculate_solution_cost(sol)
+                break
             
             numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
@@ -322,12 +325,13 @@ class CuckooSearch:
             self.instance.recalculate_route_demand_cost(_solr1)
             self.instance.recalculate_route_demand_cost(_solr2)
 
-            if _solr1.demand <= self.instance.capacity:
-                if _solr2.demand <= self.instance.capacity:
-                    sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
-                    sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
-                    self.instance.recalculate_solution_cost(sol)
-                    break
+            if (_solr1.demand <= self.instance.capacity and
+                _solr2.demand <= self.instance.capacity
+                ):
+                sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
+                sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
+                self.instance.recalculate_solution_cost(sol)
+                break
             
             numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
@@ -386,16 +390,17 @@ class CuckooSearch:
             self.instance.recalculate_route_demand_cost(_solr4)
 
 
-            if _solr1.demand <= self.instance.capacity:
-                if _solr2.demand <= self.instance.capacity:
-                    if _solr3.demand <= self.instance.capacity:
-                       if _solr4.demand <= self.instance.capacity:
-                            sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
-                            sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
-                            sol.routes[rRouteIdx[2]] = deepcopy(_solr3)
-                            sol.routes[rRouteIdx[3]] = deepcopy(_solr4)
-                            self.instance.recalculate_solution_cost(sol)
-                            break
+            if (_solr1.demand <= self.instance.capacity and
+                _solr2.demand <= self.instance.capacity and
+                _solr3.demand <= self.instance.capacity and
+                _solr4.demand <= self.instance.capacity
+                ):
+                sol.routes[rRouteIdx[0]] = deepcopy(_solr1)
+                sol.routes[rRouteIdx[1]] = deepcopy(_solr2)
+                sol.routes[rRouteIdx[2]] = deepcopy(_solr3)
+                sol.routes[rRouteIdx[3]] = deepcopy(_solr4)
+                self.instance.recalculate_solution_cost(sol)
+                break
 
             numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
