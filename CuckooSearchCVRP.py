@@ -140,7 +140,7 @@ class CuckooSearch:
                 for i in range(iterateNum):
                     self.__shift1(nest)
         else:
-            self.__swap2_2(nest)
+            self.__crossDoubleBridgeInter(nest)
 
         # One Small Neighborhood and One Large
         # if iterateNum <= 4:
