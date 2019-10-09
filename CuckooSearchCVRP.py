@@ -119,7 +119,7 @@ class CuckooSearch:
 
         # One Small Neighborhood
         # for i in range(iterateNum):
-        #     self.__shift1(nest)
+        #     self.__crossTwoOpt(nest)
         
         # Two Small Neighborhood
         # smallStepChoice = random.choice([1,2])
@@ -140,7 +140,7 @@ class CuckooSearch:
                 for i in range(iterateNum):
                     self.__shift1(nest)
         else:
-            self.__crossDoubleBridgeInter(nest)
+            self.__swap2_2(nest)
 
         # One Small Neighborhood and One Large
         # if iterateNum <= 4:
@@ -442,24 +442,21 @@ class CuckooSearch:
                 if len(_solr2.route) <= 2:
                     del _solr2
                     self.instance.recalculate_route_demand_cost(_solr1)
-                    if _solr1.cost < route.cost:
-                        del sol.routes[rRouteIdx]
-                        route = deepcopy(_solr1)
-                        self.instance.recalculate_solution_cost(sol)
-                        break
+                    sol.routes[i] = deepcopy(_solr1)
+                    del sol.routes[rRouteIdx]
+                    self.instance.recalculate_solution_cost(sol)
+                    break
                 # if original route is not empty
                 else:
                     self.instance.recalculate_route_demand_cost(_solr1)
                     self.instance.recalculate_route_demand_cost(_solr2)
-                    if (_solr1.recalculate_route_demand_cost + _solr2.cost 
+                    if (_solr1.cost + _solr2.cost 
                         < route.cost + sol.routes[rRouteIdx].cost
                         ):
-                        route = deepcopy(_solr1)
+                        sol.routes[i] = deepcopy(_solr1)
                         sol.routes[rRouteIdx] = deepcopy(_solr2)
                         self.instance.recalculate_solution_cost(sol)
-                        break
-                    
-                
+                        break                       
     def __shift2(self,sol):
         # takes solution as input
         # select route randomly
@@ -489,28 +486,26 @@ class CuckooSearch:
                         if len(_solr2.route) <= 2:
                             del _solr2
                             self.instance.recalculate_route_demand_cost(_solr1)
-                            if _solr1.cost < route.cost:
-                                del sol.routes[rRouteIdx]
-                                route = deepcopy(_solr1)
-                                self.instance.recalculate_solution_cost(sol)
-                                break
+                            sol.routes[i] = deepcopy(_solr1)
+                            del sol.routes[rRouteIdx]
+                            self.instance.recalculate_solution_cost(sol)
+                            break
                         else:
                             self.instance.recalculate_route_demand_cost(_solr1)
                             self.instance.recalculate_route_demand_cost(_solr2)
                             if (_solr1.cost + _solr2.cost 
                                 < route.cost + sol.routes[rRouteIdx].cost
                                 ):
-                                route = deepcopy(_solr1)
+                                sol.routes[i] = deepcopy(_solr1)
                                 sol.routes[rRouteIdx] = deepcopy(_solr2)
                                 self.instance.recalculate_solution_cost(sol)
                                 break
+                else:
+                    break
             else:
                 numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
-                break
-
-
-                    
+                break            
     def __exchangeIntra(self,sol):
         #takes solution as input
         # select route randomly
@@ -525,10 +520,17 @@ class CuckooSearch:
                 while True:
                     rNode = random.choices(range(1,len(sol.routes[rRouteIdx].route)-1), k=2) 
                     if rNode[0] != rNode[1]:
-                        break               
-                sol.routes[rRouteIdx].route[rNode[0]], sol.routes[rRouteIdx].route[rNode[1]]  = sol.routes[rRouteIdx].route[rNode[1]], sol.routes[rRouteIdx].route[rNode[0]]
-                self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
-                self.instance.recalculate_solution_cost(sol)
+                        break
+                _solr1 = deepcopy(sol.routes[rRouteIdx])               
+                _solr1.route[rNode[0]], _solr1.route[rNode[1]]  = _solr1.route[rNode[1]], _solr1.route[rNode[0]]
+                
+                self.instance.recalculate_route_demand_cost(_solr1)
+                if _solr1.cost < sol.routes[rRouteIdx].cost:
+                    sol.routes[rRouteIdx] = deepcopy(_solr1)
+                    self.instance.recalculate_solution_cost(sol)
+                    break
+                else:
+                    numFailedAttempts += 1
             else:
                 numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
@@ -551,11 +553,18 @@ class CuckooSearch:
                     rSwapIdx = random.randrange(1, len(sol.routes[rRouteIdx].route) - 1)
                     if rNodeIdx != rSwapIdx:
                         break
+                _solr1 = deepcopy(sol.routes[rRouteIdx])
+
                 rNode = sol.routes[rRouteIdx].route[rNodeIdx]
-                del sol.routes[rRouteIdx].route[rNodeIdx]
-                sol.routes[rRouteIdx].route.insert(rSwapIdx,rNode)
-                self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
-                self.instance.recalculate_solution_cost(sol)
+                del _solr1.route[rNodeIdx]
+                _solr1.route.insert(rSwapIdx,rNode)
+                self.instance.recalculate_route_demand_cost(_solr1)
+                if _solr1.cost < sol.routes[rRouteIdx].cost:
+                    sol.routes[rRouteIdx] = deepcopy(_solr1)
+                    self.instance.recalculate_solution_cost(sol)
+                    break
+                else:
+                    numFailedAttempts += 1
             else:
                 numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
@@ -578,20 +587,27 @@ class CuckooSearch:
                     rSwapIdx = random.randrange(1, len(sol.routes[rRouteIdx].route) - 2)
                     if rNodeIdx != rSwapIdx:
                         break
+                _solr1 = deepcopy(sol.routes[rRouteIdx])
+                
                 rNode = []
                 rNode.append(sol.routes[rRouteIdx].route[rNodeIdx])
                 rNode.append(sol.routes[rRouteIdx].route[rNodeIdx+1])
-                del sol.routes[rRouteIdx].route[rNodeIdx]
-                del sol.routes[rRouteIdx].route[rNodeIdx]
-                sol.routes[rRouteIdx].route.insert(rSwapIdx,rNode[1])
-                sol.routes[rRouteIdx].route.insert(rSwapIdx,rNode[0])
-                self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
-                self.instance.recalculate_solution_cost(sol)
+                del _solr1.route[rNodeIdx]
+                del _solr1.route[rNodeIdx]
+                _solr1.route.insert(rSwapIdx,rNode[1])
+                _solr1.route.insert(rSwapIdx,rNode[0])
+
+                self.instance.recalculate_route_demand_cost(_solr1)
+                if _solr1.cost < sol.routes[rRouteIdx].cost:
+                    sol.routes[rRouteIdx] = deepcopy(_solr1)
+                    self.instance.recalculate_solution_cost(sol)
+                    break
+                else:
+                    numFailedAttempts += 1
             else:
                 numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
-                break
-        
+                break     
     def __orOpt3(self,sol):
         """
         From the given solution, randomly selects a route, node,
@@ -610,18 +626,25 @@ class CuckooSearch:
                     rSwapIdx = random.randrange(1, len(sol.routes[rRouteIdx].route) - 3)
                     if rNodeIdx != rSwapIdx:
                         break
+                _solr1 = deepcopy(sol.routes[rRouteIdx])  
+                
                 rNode = []
                 rNode.append(sol.routes[rRouteIdx].route[rNodeIdx])
                 rNode.append(sol.routes[rRouteIdx].route[rNodeIdx+1])
                 rNode.append(sol.routes[rRouteIdx].route[rNodeIdx+2])
-                del sol.routes[rRouteIdx].route[rNodeIdx]
-                del sol.routes[rRouteIdx].route[rNodeIdx]
-                del sol.routes[rRouteIdx].route[rNodeIdx]
-                sol.routes[rRouteIdx].route.insert(rSwapIdx,rNode[2])
-                sol.routes[rRouteIdx].route.insert(rSwapIdx,rNode[1])
-                sol.routes[rRouteIdx].route.insert(rSwapIdx,rNode[0])
-                self.instance.recalculate_route_demand_cost(sol.routes[rRouteIdx])
-                self.instance.recalculate_solution_cost(sol)
+                del _solr1.route[rNodeIdx]
+                del _solr1.route[rNodeIdx]
+                del _solr1.route[rNodeIdx]
+                _solr1.route.insert(rSwapIdx,rNode[2])
+                _solr1.route.insert(rSwapIdx,rNode[1])
+                _solr1.route.insert(rSwapIdx,rNode[0])
+                self.instance.recalculate_route_demand_cost(_solr1)
+                if _solr1.cost < sol.routes[rRouteIdx].cost:
+                    sol.routes[rRouteIdx] = deepcopy(_solr1)
+                    self.instance.recalculate_solution_cost(sol)
+                    break
+                else:
+                    numFailedAttempts += 1
             else:
                 numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
