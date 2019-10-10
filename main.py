@@ -25,7 +25,7 @@ FinalResultsPath = 'finalresults/'
 numNests = 15
 Pa = 0.25 # Fraction of worse solutions to be replaced
 Pc = 0.6 # Fraction of cuckoos performing Levy Flights
-maxGenerations = 500# maximum number of iterations
+maxGenerations = 1000# maximum number of iterations
 stopCriterion = maxGenerations # attempt limit of successive iterations
 
 print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' + str(Pc) +
@@ -33,7 +33,7 @@ print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' 
 
 #region iterate 30 times
 numIter = 30
-fileNameSuffix = 'swap21_shift1_doubleBridge_5050_levy4_levy5_500iter'
+fileNameSuffix = 'results00_crossTwoOpt_exchange_doubleBridge_5050_levy4_levy5'
 
 experimentData = exp.initializeExperimentData()
 instanceData = exp.initializeInstanceData()

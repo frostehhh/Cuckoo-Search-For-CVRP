@@ -135,10 +135,10 @@ class CuckooSearch:
             smallStepChoice = random.choice([1,2])
             if smallStepChoice == 1:
                 for i in range(iterateNum):
-                    self.__swap2_1(nest)
+                    self.__crossTwoOpt(nest)
             else:
                 for i in range(iterateNum):
-                    self.__shift1(nest)
+                    self.__exchangeIntra(nest)
         else:
             self.__crossDoubleBridgeInter(nest)
 
