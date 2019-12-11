@@ -113,7 +113,7 @@ class CuckooSearch:
         r = abs(r)
         iterateNum = math.ceil(r)
 
-        upperBound = 6
+        upperBound = 5
         if iterateNum > upperBound:
             iterateNum = upperBound
 
