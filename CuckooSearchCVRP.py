@@ -131,16 +131,31 @@ class CuckooSearch:
         #         self.__shift1(nest)
 
         # Two  Small Neighborhood and One Large
+        # if iterateNum <= 4:
+        #     smallStepChoice = random.choice([1,2])
+        #     if smallStepChoice == 1:
+        #         for i in range(iterateNum):
+        #             self.__crossTwoOpt(nest)
+        #     else:
+        #         for i in range(iterateNum):
+        #             self.__swap11(nest)
+        # else:
+        #     self.__swap2_2(nest)
+
+        # Three  Small Neighborhood and One Large
         if iterateNum <= 4:
-            smallStepChoice = random.choice([1,2])
+            smallStepChoice = random.choice([1,2,3])
             if smallStepChoice == 1:
                 for i in range(iterateNum):
                     self.__crossTwoOpt(nest)
-            else:
+            elif smallStepChoice == 2:
                 for i in range(iterateNum):
-                    self.__exchangeIntra(nest)
+                    self.__swap11(nest)
+            else: 
+                for i in range(iterateNum):
+                    self.__reinsertionIntra(nest)
         else:
-            self.__crossDoubleBridgeInter(nest)
+            self.__swap2_2(nest)
 
         # One Small Neighborhood and One Large
         # if iterateNum <= 4:

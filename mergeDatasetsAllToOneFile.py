@@ -10,7 +10,7 @@ import experiment as e
 
 
 DataSetResultsPath = 'finalresults/'
-DatasetList = os.listdir(DataSetResultsPath)[2:]
+DatasetList = os.listdir(DataSetResultsPath)[3:]
 savePath = 'finalresults/'
 fileName = 'completeFinalResults'
 data = []
