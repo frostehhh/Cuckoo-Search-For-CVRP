@@ -37,7 +37,9 @@ class CuckooSearch:
         self.pdf_type = pdf_type
         self.numCuckoos = numCuckoos
         self.stopCriterion = stopCriterion
+        self.bestSolIterationsRetainedCtr = 0
         self.nests = []
+        self.bestSolution = None
         self.numFailedAttemptsLevyLimit = 1
         random.seed()
 
@@ -91,8 +93,15 @@ class CuckooSearch:
             # Sort from best to worst and keep best solution
             self.nests.sort(key = o.attrgetter('cost'))
 
+            self.bestSolIterationsRetainedCtr += 1
+            if self.bestSolIterationsRetainedCtr == self.stopCriterion:
+                break
+
+            if self.bestSolution is None or self.nests[0].cost <= self.bestSolution.cost:
+                self.bestSolution = self.nests[0]
+                self.bestSolIterationsRetainedCtr = 1
             # Get Best solution cost and count number of iterations wherein it is retained.
-            
+
     #endregion
 
     #region original levy flight implementation, levy step = number of 2-opt
