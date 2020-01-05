@@ -31,7 +31,7 @@ stopCriterion = maxGenerations/5 # attempt limit of successive iterations
 print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' + str(Pc) +
 ' maxGenerations: ' + str(maxGenerations) + ' stopCriterion = ' + str(stopCriterion))
 
-#region iterate 30 times
+
 numIter = 30
 fileNameSuffix = 'results00_crossTwoOpt_reinsertion_shift1_swap22_333_levy4_levy5'
 
@@ -41,7 +41,7 @@ for dataset in DataSetA:
         instanceData = exp.initializeInstanceData()
         for i in range(numIter):
                 CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations, stopCriterion = stopCriterion)
                 solver.solveInstance()
                 exp.appendRowToInstanceDf(instanceData, solver.readData())
         row = exp.calculateInstanceResults(instanceData)
@@ -52,7 +52,7 @@ for dataset in DataSetB:
         instanceData = exp.initializeInstanceData()
         for i in range(numIter):
                 CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations, stopCriterion = stopCriterion)
                 solver.solveInstance()
                 exp.appendRowToInstanceDf(instanceData, solver.readData())
         row = exp.calculateInstanceResults(instanceData)
@@ -64,40 +64,11 @@ for dataset in DataSetP:
         instanceData = exp.initializeInstanceData()
         for i in range(numIter):
                 CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
+                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations, stopCriterion = stopCriterion)
                 solver.solveInstance()
                 exp.appendRowToInstanceDf(instanceData, solver.readData())
         row = exp.calculateInstanceResults(instanceData)
         exp.appendRowToExperimentDf(experimentData, row)
 # exp.saveResultsToCsv(experimentData, FinalResultsSetPPath, fileNameSuffix, type='finalresults')
 exp.saveResultsToCsv(experimentData, FinalResultsPath, fileNameSuffix, type='finalresults')
-
-
-#endregion
-
-#region iterate once
-# fileNameSuffix = 'crossTwoOpt_reinsertion_swap22_5050_levy4_levy5_30000'
-# data = []
-# data = exp.initializeInstanceData()
-# for dataset in DataSetA:
-#         CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         exp.appendRowToInstanceDf(data, solver.readData())
-# exp.saveResultsToCsv(data, ResultsSetAPath, fileNameSuffix)
-
-# for dataset in DataSetB:
-#         CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         exp.appendRowToInstanceDf(data, solver.readData())
-# # exp.saveResultsToCsv(data, ResultsSetBPath, fileNameSuffix)
-
-# for dataset in DataSetP:
-#         CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
-#         solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations)
-#         solver.solveInstance()
-#         exp.appendRowToInstanceDf(data, solver.readData())
-# exp.saveResultsToCsv(data, ResultsPath, fileNameSuffix, type='results')
-#endregion
 

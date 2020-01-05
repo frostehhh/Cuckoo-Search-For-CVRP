@@ -29,13 +29,14 @@ class CuckooSearch:
     """
 
     #region initialize with random solution
-    def __init__(self, CVRPInstance, numCuckoos = 15, Pa = 0.25, Pc = 0.6, generations = 500, pdf_type = 'levy'):
+    def __init__(self, CVRPInstance, numCuckoos = 15, Pa = 0.25, Pc = 0.6, generations = 500, pdf_type = 'levy', stopCriterion = 100):
         self.instance = CVRPInstance
         self.Pa = Pa
         self.Pc = Pc
         self.generations = generations
         self.pdf_type = pdf_type
         self.numCuckoos = numCuckoos
+        self.stopCriterion = stopCriterion
         self.nests = []
         self.numFailedAttemptsLevyLimit = 1
         random.seed()
@@ -89,6 +90,9 @@ class CuckooSearch:
 
             # Sort from best to worst and keep best solution
             self.nests.sort(key = o.attrgetter('cost'))
+
+            # Get Best solution cost and count number of iterations wherein it is retained.
+            
     #endregion
 
     #region original levy flight implementation, levy step = number of 2-opt
