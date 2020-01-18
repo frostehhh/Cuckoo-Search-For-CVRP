@@ -159,13 +159,13 @@ class CuckooSearch:
             x = limit
 
     def __levy_small1(self, nest):
-        r = self.__generateLevyStep(limit=6)
+        r = self.__generateLevyStep(limit=5)
 
         for i in range(r):
             self.levyNeighborhoods[0](nest)
 
     def __levy_small2(self, nest):
-        r = self.__generateLevyStep(limit=6)
+        r = self.__generateLevyStep(limit=5)
 
         smallStepChoice = random.choice([1,2])
         if smallStepChoice == 1:

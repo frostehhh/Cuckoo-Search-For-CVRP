@@ -29,7 +29,7 @@ class CSRunner:
         Pa = 0.25 # Fraction of worse solutions to be replaced
         Pc = 0.6 # Fraction of cuckoos performing Levy Flights
         maxGenerations = 500# maximum number of iterations
-        stopCriterion = maxGenerations # attempt limit of successive iterations
+        stopCriterion = 100 # attempt limit of successive iterations
 
         
 
