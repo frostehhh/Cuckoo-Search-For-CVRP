@@ -4,7 +4,7 @@ Same number of files in all directories
 Merge datasets from A-VRP, B-VRP, P-VRP into one. Filename will be equivalent to filenames or results.
 Save to newresults.
 
-I don't need this anymore
+I don't need this anymore. OUTDATED
 """
 import os
 import pandas as pd
