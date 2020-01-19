@@ -14,20 +14,19 @@ DataSet = os.listdir(DataSetPath) # list of file names of of instances from
 #end region
 
 # FinalResultsPath = 'finalresults/'
-ResultsPerImplementationPath = 'newFinalResults/perImplementation/'
-ResultsPerRunPath = 'newFinalResults/perRun/'
+finalResultsPath = 'newFinalResults/'
 
 #Initialize Cuckoo SearchParameters
 numNests = 15
 Pa = 0.25 # Fraction of worse solutions to be replaced
 Pc = 0.6 # Fraction of cuckoos performing Levy Flights
-maxGenerations = 10# maximum number of iterations
+maxGenerations = 1000# maximum number of iterations
 stopCriterion = maxGenerations/5 # attempt limit of successive iterations
 
 print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' + str(Pc) +
 ' maxGenerations: ' + str(maxGenerations) + ' stopCriterion = ' + str(stopCriterion))
 
-numIter = 10
+numIter = 30
 fileName = 'FinalResults'
 implementationName = '2-opt, shift-1, swap-2-2'
 
@@ -46,6 +45,7 @@ for dataset in DataSet:
                 completeInstanceData["Implementation"] = implementationName
         row = exp.calculateInstanceResults(instanceData)
         exp.appendRowToExperimentDf(experimentData, row)
-exp.saveResultsToCsv(completeInstanceData, ResultsPerRunPath, fileName + 'PerRun', type='merge')
-exp.saveResultsToCsv(experimentData, ResultsPerImplementationPath, fileName + 'PerImplementation', type='merge')
+        experimentData["Implementation"] = implementationName
+exp.saveResultsToCsv(completeInstanceData, finalResultsPath, fileName + 'PerRun', type='merge')
+exp.saveResultsToCsv(experimentData, finalResultsPath, fileName + 'PerImplementation', type='merge')
 
