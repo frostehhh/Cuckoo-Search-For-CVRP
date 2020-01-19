@@ -9,66 +9,43 @@ experimentData = []
 instanceData = []
 
 #region Load Datasets
-DataSetAPath = 'data/A-VRP/'
-DataSetBPath = 'data/B-VRP/'
-DataSetPPath = 'data/P-VRP/'
-
-DataSetA = os.listdir(DataSetAPath) # list of file names of benchmark instances from Set A
-DataSetB = os.listdir(DataSetBPath) # list of file names of benchmark instances from Set B
-DataSetP = os.listdir(DataSetPPath) # list of file names of benchmark instances from Set P
+DataSetPath = 'data/FinalDataset/'
+DataSet = os.listdir(DataSetPath) # list of file names of of instances from 
 #end region
 
-ResultsPath = 'results/'
-FinalResultsPath = 'finalresults/'
+# FinalResultsPath = 'finalresults/'
+ResultsPerImplementationPath = 'newFinalResults/perImplementation/'
+ResultsPerRunPath = 'newFinalResults/perRun/'
 
 #Initialize Cuckoo SearchParameters
 numNests = 15
 Pa = 0.25 # Fraction of worse solutions to be replaced
 Pc = 0.6 # Fraction of cuckoos performing Levy Flights
-maxGenerations = 1000# maximum number of iterations
+maxGenerations = 10# maximum number of iterations
 stopCriterion = maxGenerations/5 # attempt limit of successive iterations
 
 print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' + str(Pc) +
 ' maxGenerations: ' + str(maxGenerations) + ' stopCriterion = ' + str(stopCriterion))
 
+numIter = 10
+fileName = 'FinalResults'
+implementationName = '2-opt, shift-1, swap-2-2'
 
-numIter = 30
-fileNameSuffix = 'results00_crossTwoOpt_reinsertion_shift1_swap22_333_levy4_levy5'
 
 experimentData = exp.initializeExperimentData()
 instanceData = exp.initializeInstanceData()
-for dataset in DataSetA:
+completeInstanceData = exp.initializeInstanceData()
+for dataset in DataSet:
         instanceData = exp.initializeInstanceData()
         for i in range(numIter):
-                CVRPInstance = CVRP(DataSetAPath + dataset) #pass data to CVRP       
+                CVRPInstance = CVRP(DataSetPath + dataset) #pass data to CVRP       
                 solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations, stopCriterion = stopCriterion)
                 solver.solveInstance()
                 exp.appendRowToInstanceDf(instanceData, solver.readData())
+                exp.appendRowToInstanceDf(completeInstanceData, solver.readData())
+                completeInstanceData["Implementation"] = implementationName
         row = exp.calculateInstanceResults(instanceData)
         exp.appendRowToExperimentDf(experimentData, row)
-# exp.saveResultsToCsv(experimentData, FinalResultsSetAPath, fileNameSuffix, type='finalresults')
-
-for dataset in DataSetB:
-        instanceData = exp.initializeInstanceData()
-        for i in range(numIter):
-                CVRPInstance = CVRP(DataSetBPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations, stopCriterion = stopCriterion)
-                solver.solveInstance()
-                exp.appendRowToInstanceDf(instanceData, solver.readData())
-        row = exp.calculateInstanceResults(instanceData)
-        exp.appendRowToExperimentDf(experimentData, row)
-# exp.saveResultsToCsv(experimentData, FinalResultsSetBPath, fileNameSuffix, type='finalresults')
-
-
-for dataset in DataSetP:
-        instanceData = exp.initializeInstanceData()
-        for i in range(numIter):
-                CVRPInstance = CVRP(DataSetPPath + dataset) #pass data to CVRP       
-                solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations, stopCriterion = stopCriterion)
-                solver.solveInstance()
-                exp.appendRowToInstanceDf(instanceData, solver.readData())
-        row = exp.calculateInstanceResults(instanceData)
-        exp.appendRowToExperimentDf(experimentData, row)
-# exp.saveResultsToCsv(experimentData, FinalResultsSetPPath, fileNameSuffix, type='finalresults')
-exp.saveResultsToCsv(experimentData, FinalResultsPath, fileNameSuffix, type='finalresults')
+exp.saveResultsToCsv(completeInstanceData, ResultsPerRunPath, fileName + 'PerRun', type='merge')
+exp.saveResultsToCsv(experimentData, ResultsPerImplementationPath, fileName + 'PerImplementation', type='merge')
 

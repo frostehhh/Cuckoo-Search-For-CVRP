@@ -3,6 +3,8 @@ Read directory of results, results/A-VRP, results/B-VRP, results/P-VRP
 Same number of files in all directories
 Merge datasets from A-VRP, B-VRP, P-VRP into one. Filename will be equivalent to filenames or results.
 Save to newresults.
+
+I don't need this anymore
 """
 import os
 import pandas as pd
@@ -18,10 +20,14 @@ data = []
 # store all datasets in data[] list
 for i in range(len(DatasetList)):
     data.append(pd.read_csv(DataSetResultsPath + DatasetList[i], header=[0]))
+
+    # build _ variable to fill up fileName column
     _ = []
-    instanceRange = data[0].index
-    for j in instanceRange:
+    instanceCount = data[0].index # .index is the number of rows in the dataFrame
+    for j in instanceCount:
         _.append(DatasetList[i])
+
+    # inserting fileName column values
     data[i].insert(loc=1, column='fileName', value=_)
 
 # all data is stored in finaldata
