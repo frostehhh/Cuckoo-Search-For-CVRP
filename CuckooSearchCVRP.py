@@ -148,19 +148,19 @@ class CuckooSearch:
             smallStepChoice = random.choice([1,2])
             if smallStepChoice == 1:
                 for i in range(iterateNum):
-                    self.__reinsertionIntra(nest)
+                    self.__twoOptInter(nest)
             else:
                 for i in range(iterateNum):
                     self.__shift1(nest)
         else:
-            self.__crossDoubleBridgeInter(nest)
+            self.__doubleBridgeInter(nest)
 
         # Three  Small Neighborhood and One Large
         # if iterateNum <= 4:
         #     smallStepChoice = random.choice([1,2,3])
         #     if smallStepChoice == 1:
         #         for i in range(iterateNum):
-        #             self.__crossTwoOpt(nest)
+        #             self.__twoOptInter(nest)
         #     elif smallStepChoice == 2:
         #         for i in range(iterateNum):
         #             self.__swap11(nest)
@@ -175,14 +175,14 @@ class CuckooSearch:
         #     for i in range(iterateNum):
         #         self.__swap2_1(nest)
         # else:
-        #     self.__crossDoubleBridgeInter(nest)
+        #     self.__doubleBridgeInter(nest)
 
     #endregion
     
 
     #region neighborhood structures
     # the true twoOptInter
-    def __crossTwoOpt(self,sol):
+    def __twoOptInter(self,sol):
         # takes solution as input
         # gets 2 routes randomly
         # exchange 2 customer arcs
@@ -364,7 +364,7 @@ class CuckooSearch:
             numFailedAttempts += 1
             if numFailedAttempts == self.numFailedAttemptsLevyLimit:
                 break
-    def __crossDoubleBridgeInter(self, sol):
+    def __doubleBridgeInter(self, sol):
         # takes solution as input
         # gets 4 routes randomly
         # Select random node from each
