@@ -160,7 +160,7 @@ def calculateInstanceResults(instanceData):
                 ,minSolCost, maxSolCost, avgSolCost, stdSolCost, avgRunTime)
         print()
         return data
-def saveResultsToCsv(df, path, fileNameSuffix, type='results'):
+def saveResultsToCsv(df, path, fileNameSuffix, type='default'):
         df = pd.DataFrame(df)
         # write to results.csv
         fileNum = 0
@@ -169,17 +169,21 @@ def saveResultsToCsv(df, path, fileNameSuffix, type='results'):
                         _ = '0' + str(fileNum)
                 else:
                         _ = str(fileNum)
-                if type == 'results':
+                if type == 'default': # per implementation
                         df.to_csv(path + fileNameSuffix + '.csv')
                         print('Saved ' + fileNameSuffix + '.csv')
                         break
-                elif type == 'finalresults': # per implementation
-                        df.to_csv(path + fileNameSuffix + '.csv')
-                        print('Saved ' + fileNameSuffix + '.csv')
-                        break
-                elif type == 'mergeAll': # merge everything
-                        df.to_csv(path + fileNameSuffix + '.csv')
-                        print('Saved ' + fileNameSuffix + '.csv')
+                elif type == 'merge':
+                        # NOT DONE
+                        if os.path.exists(path + fileNameSuffix + '.csv'):
+                                data = pd.read_csv(path + fileNameSuffix + '.csv', header=[0])
+                                data = data.append(df)
+                                data.drop(data.columns[5],axis=1, inplace=True)
+                                data.reset_index(inplace=True, drop=True)
+                                data.to_csv(path + fileNameSuffix + '.csv')
+                        else:
+                                df.to_csv(path + fileNameSuffix + '.csv')
+                        
                         break
                 else: # extra
                         if os.path.exists(path + 'results' +  _ + '_' + fileNameSuffix + '.csv'):
