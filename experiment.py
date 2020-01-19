@@ -178,6 +178,7 @@ def saveResultsToCsv(df, path, fileNameSuffix, type='default'):
                         if os.path.exists(path + fileNameSuffix + '.csv'):
                                 data = pd.read_csv(path + fileNameSuffix + '.csv', header=[0], index_col=0)
                                 data = data.append(df, sort=False)
+                                data.reset_index(inplace=True, drop=True)
                                 # data.drop(data.columns[data.columns.size - 1], axis=1, inplace=True)
                                 # data.reset_index(inplace=True, drop=True)
                                 data.to_csv(path + fileNameSuffix + '.csv')
