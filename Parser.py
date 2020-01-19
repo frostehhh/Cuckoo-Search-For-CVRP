@@ -1,12 +1,14 @@
 import regex as re
+from decimal import Decimal as decimal
+
 
 rx_dict = {
     'name': re.compile(r'NAME : (?P<name>.*)'),
-    'comment': re.compile(r'COMMENT : [(]Augerat et al, (Min no of trucks|No of trucks): (?P<minNumVehicles>[0-9]+), (Optimal|Best) value: (?P<optimalValue>[0-9]+)[)]\n'),
+    'comment': re.compile(r'COMMENT : [(][A-Za-z ]*(,|:) (problem [0-9]*, |)(Min no of trucks|No of trucks): (?P<minNumVehicles>[0-9]+), (Optimal|Best) value: (?P<optimalValue>[0-9]+)[)]\n'),
     'capacity': re.compile(r'CAPACITY : (?P<capacity>[0-9]+)\n'),
     'node_coord': re.compile(r'NODE_COORD_SECTION'),
     'demand_values': re.compile(r'DEMAND_SECTION'),
-    'values' : re.compile(r'[0-9]+ (?P<x>[0-9]+)( )?(?P<y>[0-9]+)?( )?(\\n)?') # test this
+    'values' : re.compile(r'[0-9]+ (?P<x>-{0,1}[0-9]+[.]{0,1}[0-9]*)( )*(?P<y>-{0,1}[0-9]+[.]{0,1}[0-9]*)*( )*(\\n)*') # test this
 }
 
 def _parse_line(line):
@@ -74,12 +76,12 @@ def parse_file(filepath):
             elif IsDemandValue == True and key != 'values':
                 IsDemandValue = False
             elif IsNodeCoord and key == 'values':
-                x = int(match.group('x'))
-                y = int(match.group('y'))
+                x = decimal(match.group('x'))
+                y = decimal(match.group('y'))
                 coord = [x,y]
                 listCoords.append(coord)
             elif IsDemandValue and key == 'values':
-                demand = int(match.group('x'))
+                demand = decimal(match.group('x'))
                 listDemand.append(demand)
             line = file_object.readline()
 
