@@ -7,7 +7,7 @@ import numpy as np
 
 #region Variable Initialization
 sourcePath = 'newFinalResults/'
-sourceFileName = 'FinalResultsPerRun - Work'
+sourceFileName = 'FinalResultsPerRun'
 resultsPath = 'newFinalResults/'
 resultsFileName = 'WilcoxonFinal'
 
@@ -37,18 +37,18 @@ row = {}
 #endregion
 
 #region TESTING 
-df1 = data.loc[data["Implementation"] == '2-opt, shift-1, double-bridge']
-df1_data = df1["Best Solution Cost"].tolist()
+# df1 = data.loc[data["Implementation"] == '2-opt, shift-1, double-bridge']
+# df1_data = df1["Best Solution Cost"].tolist()
 
-print(df1.head())
-print(implementationRange)
+# print(df1.head())
+# print(implementationRange)
 #endregion
 
 
 
 # Iterate through every possible pair of implementations
 for i in implementationRange[:-1]:
-    for j in implementationRange[1:]:
+    for j in implementationRange[i+1:]:
         # compare i and j
         # iterate through every instance of implementations i and j
         for k in instanceRange:
@@ -66,8 +66,10 @@ for i in implementationRange[:-1]:
             df1_runtimeList = df1["Run Time"].tolist()
             df2_runtimeList = df2["Run Time"].tolist()
         
-            _, p_value = wilcoxon(x = df1_solutionCostList, y = df2_solutionCostList)
-
+            try:
+                _, p_value = wilcoxon(x = df1_solutionCostList, y = df2_solutionCostList)
+            except: 
+                print()
             # build the resulting dataFrame
             row = {
                 'Instance': instanceList[k],
