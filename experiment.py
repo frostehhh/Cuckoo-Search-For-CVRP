@@ -210,3 +210,75 @@ def saveResultsToCsv(df, path, fileNameSuffix, type='default'):
 #                         break
 #         f = open("results.txt","w+")
 #endregion
+
+def initializeWilcoxonDf():
+    """
+    Initializes Wilcoxon Dict to be converted to DataFrame
+
+    Returns
+    ------
+    {
+        'Instance':[],
+        'Optimal Value':[],
+        'Implementation 1':[],
+        'Minimum Solution Cost 1':[],
+        'Average Solution Cost 1':[],
+        'Std Solution Cost 1':[],
+        'Average Runtime 1':[],
+        'Implementation 2':[],
+        'Minimum Solution Cost 2':[],
+        'Average Solution Cost 2':[],
+        'Std Solution Cost 2':[],
+        'Average Runtime 2':[],
+        'P-value':[]
+    } 
+    """
+    return {
+        'Instance':[],
+        'Optimal Value':[],
+        'Implementation 1':[],
+        'Minimum Solution Cost 1':[],
+        'Average Solution Cost 1':[],
+        'Std Solution Cost 1':[],
+        'Average Runtime 1':[],
+        'Implementation 2':[],
+        'Minimum Solution Cost 2':[],
+        'Average Solution Cost 2':[],
+        'Std Solution Cost 2':[],
+        'Average Runtime 2':[],
+        'P-value':[]
+    } 
+
+def appendRowToWilcoxonDf(df, row):
+        """
+        Insert instanceData from row into df
+
+        row = {
+                'Instance': "string",
+                'Optimal Value': 0,
+                'Implementation 1': "string",
+                'Minimum Solution Cost 1':0,
+                'Average Solution Cost 1':0,
+                'Std Solution Cost 1':0,
+                'Average Runtime 1':0,
+                'Implementation 2':"string",
+                'Minimum Solution Cost 2':0,
+                'Average Solution Cost 2':0,
+                'Std Solution Cost 2':0,
+                'Average Runtime 2':0,
+                'P-value':0
+        } 
+        """
+        df['Instance'] += [row['Instance']]
+        df['Optimal Value'] += [row['Optimal Value']]
+        df['Implementation 1'] += [row['Implementation 1']]
+        df['Minimum Solution Cost 1'] += [row['Minimum Solution Cost 1']]
+        df['Average Solution Cost 1'] += [row['Average Solution Cost 1']]
+        df['Std Solution Cost 1'] += [row['Std Solution Cost 1']]
+        df['Average Runtime 1'] += [row['Average Runtime 1']]
+        df['Implementation 2'] += [row['Implementation 2']]
+        df['Minimum Solution Cost 2'] += [row['Minimum Solution Cost 2']]
+        df['Average Solution Cost 2'] += [row['Average Solution Cost 2']]
+        df['Std Solution Cost 2'] += [row['Std Solution Cost 2']]
+        df['Average Runtime 2'] += [row['Average Runtime 2']]
+        df['P-value'] += [row['P-value']]
