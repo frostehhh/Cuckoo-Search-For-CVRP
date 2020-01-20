@@ -28,7 +28,7 @@ print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' 
 
 numIter = 30
 fileName = 'FinalResults'
-implementationName = '2-opt, shift-1, swap-2-2'
+implementationName = '2-opt, shift-1, double-bridge'
 
 
 experimentData = exp.initializeExperimentData()
