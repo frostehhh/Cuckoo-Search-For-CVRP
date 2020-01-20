@@ -151,9 +151,9 @@ class CuckooSearch:
                     self.__twoOptInter(nest)
             else:
                 for i in range(iterateNum):
-                    self.__shift1(nest)
+                    self.__reinsertionIntra(nest)
         else:
-            self.__doubleBridgeInter(nest)
+            self.__swap2_2(nest)
 
         # Three  Small Neighborhood and One Large
         # if iterateNum <= 4:
