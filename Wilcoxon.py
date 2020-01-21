@@ -7,24 +7,27 @@ import numpy as np
 
 #region Variable Initialization
 sourcePath = 'newFinalResults/'
-sourceFileName = 'FinalResultsPerRun - Compiled'
+sourceFileName = 'FinalResultsPerRun - Compiled Csv'
 resultsPath = 'newFinalResults/'
-resultsFileName = 'WilcoxonFinal'
+resultsPerInstanceFileName = 'WilcoxonPerInstanceFinal'
+resultsPerImplementationFileName = 'WilcoxonPerImplementationFinal'
 
 data = pd.read_csv(sourcePath + sourceFileName + '.csv', header=[0], index_col=0)
 implementationList = data.Implementation.unique()
 instanceList = data.Name.unique()
 implementationRange = range(len(implementationList))
-instanceRange = range(len(instanceList))
+instanceLength = len(instanceList)
+instanceRange = range(instanceLength)
 
 # DataFrame Variables
 df1 = None
 df2 = None
-WilcoxonDf = initializeWilcoxonDf()
+WilcoxonPerInstanceDf = initializeWilcoxonDf()
+WilcoxonPerImplementationDf = initializeWilcoxonDf()
 
 minSolCost = None
 avgSolCost = None
-stdSoldCost = None
+stdSolCost = None
 avgRuntime = None
 p_value = None
 
@@ -70,25 +73,56 @@ for i in implementationRange[:-1]:
             try:
                 _, p_value = wilcoxon(x = df1_solutionCostList, y = df2_solutionCostList)
             except: 
-                print()
-            # build the resulting dataFrame
+                print("Error with acquiring wilcoxon p-value")
+            
+            minSolCost = [min(df1_solutionCostList), min(df2_solutionCostList)]
+            avgSolCost = [np.average(df1_solutionCostList), np.average(df2_solutionCostList)]
+            stdSolCost = [np.std(df1_solutionCostList), np.std(df2_solutionCostList)]
+            avgRuntime = [np.average(df1_runtimeList), np.average(df2_runtimeList)]
+
+            # build the resulting WilcoxonPerInstanceDf
             row = {
                 'Instance': instanceList[k],
                 'Optimal Value': optimalValue,
                 'Implementation 1': implementation1Name,
-                'Minimum Solution Cost 1': min(df1_solutionCostList),
-                'Average Solution Cost 1': np.average(df1_solutionCostList),
-                'Std Solution Cost 1': np.std(df1_solutionCostList),
-                'Average Runtime 1': np.average(df1_runtimeList),
+                'Minimum Solution Cost 1': minSolCost[0],
+                'Average Solution Cost 1': avgSolCost[0],
+                'Std Solution Cost 1': stdSolCost[0],
+                'Average Runtime 1': avgRuntime[0],
                 'Implementation 2': implementation2Name,
-                'Minimum Solution Cost 2': min(df2_solutionCostList),
-                'Average Solution Cost 2': np.average(df2_solutionCostList),
-                'Std Solution Cost 2': np.std(df2_solutionCostList),
-                'Average Runtime 2': np.average(df2_runtimeList),
+                'Minimum Solution Cost 2': minSolCost[1],
+                'Average Solution Cost 2': avgSolCost[1],
+                'Std Solution Cost 2': stdSolCost[1],
+                'Average Runtime 2': avgRuntime[1],
                 'P-value': p_value
             }
-            appendRowToWilcoxonDf(WilcoxonDf, row)
-saveResultsToCsv(WilcoxonDf, resultsPath, resultsFileName)
+            appendRowToWilcoxonDf(WilcoxonPerInstanceDf, row)
+        
+        #build the resulting WilcoxonPerImplementationDf
+        try:
+            _, p_value = wilcoxon(x = WilcoxonPerInstanceDf['Average Solution Cost 1'][-instanceLength:],
+                                     y = WilcoxonPerInstanceDf['Average Solution Cost 2'][-instanceLength:])
+        except: 
+            print("Error with acquiring wilcoxon p-value")
+
+        row = {
+            'Instance': "",
+            'Optimal Value': optimalValue,
+            'Implementation 1': implementation1Name,
+            'Minimum Solution Cost 1': np.average(WilcoxonPerInstanceDf['Minimum Solution Cost 1'][-instanceLength:]),
+            'Average Solution Cost 1': np.average(WilcoxonPerInstanceDf['Average Solution Cost 1'][-instanceLength:]),
+            'Std Solution Cost 1': np.average(WilcoxonPerInstanceDf['Std Solution Cost 1'][-instanceLength:]),
+            'Average Runtime 1': np.average(WilcoxonPerInstanceDf['Average Runtime 1'][-instanceLength:]),
+            'Implementation 2': implementation2Name,
+            'Minimum Solution Cost 2': np.average(WilcoxonPerInstanceDf['Minimum Solution Cost 2'][-instanceLength:]),
+            'Average Solution Cost 2': np.average(WilcoxonPerInstanceDf['Average Solution Cost 2'][-instanceLength:]),
+            'Std Solution Cost 2': np.average(WilcoxonPerInstanceDf['Std Solution Cost 2'][-instanceLength:]),
+            'Average Runtime 2': np.average(WilcoxonPerInstanceDf['Average Runtime 2'][-instanceLength:]),
+            'P-value': p_value
+        }
+        appendRowToWilcoxonDf(WilcoxonPerImplementationDf, row)
+saveResultsToCsv(WilcoxonPerInstanceDf, resultsPath, resultsPerInstanceFileName)
+saveResultsToCsv(WilcoxonPerImplementationDf, resultsPath, resultsPerImplementationFileName)
 
 
         
