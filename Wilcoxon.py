@@ -61,7 +61,7 @@ for i in implementationRange[:-1]:
             df2 = data.loc[lambda data: (data["Name"] == instanceName) & (data["Implementation"] == implementation2Name)]
             
 
-            optimalValue = df1.loc[0, 'Optimal Value']
+            optimalValue = df1.iloc[0, 2]
             df1_solutionCostList = df1["Best Solution Cost"].tolist()
             df2_solutionCostList = df2["Best Solution Cost"].tolist()
             df1_runtimeList = df1["Run Time"].tolist()
