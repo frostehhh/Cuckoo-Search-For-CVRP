@@ -55,12 +55,13 @@ for i in implementationRange[:-1]:
             instanceName = instanceList[k]
             implementation1Name = implementationList[i]
             implementation2Name = implementationList[j]
-            optimalValue = data.loc[0, 'Optimal Value']
-
+            
             # In each implementation, get rows for the current instance
             df1 = data.loc[lambda data: (data["Name"] == instanceName) & (data["Implementation"] == implementation1Name)]
             df2 = data.loc[lambda data: (data["Name"] == instanceName) & (data["Implementation"] == implementation2Name)]
             
+
+            optimalValue = df1.loc[0, 'Optimal Value']
             df1_solutionCostList = df1["Best Solution Cost"].tolist()
             df2_solutionCostList = df2["Best Solution Cost"].tolist()
             df1_runtimeList = df1["Run Time"].tolist()
