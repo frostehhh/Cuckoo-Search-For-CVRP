@@ -7,7 +7,7 @@ import numpy as np
 
 #region Variable Initialization
 sourcePath = 'newFinalResults/'
-sourceFileName = 'FinalResultsPerRun'
+sourceFileName = 'FinalResultsPerRun - Compiled'
 resultsPath = 'newFinalResults/'
 resultsFileName = 'WilcoxonFinal'
 
