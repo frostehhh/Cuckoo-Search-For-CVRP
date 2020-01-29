@@ -26,32 +26,31 @@ datasetPCount = 24
 # DataFrame Variables
 df1 = None
 df2 = None
+df1_solutionCostList = None
+df2_solutionCostList = None
+df1_runtimeList = None
+df2_runtimeList = None
 WilcoxonPerInstanceDf = initializeWilcoxonDf()
 WilcoxonPerDatasetDf = initializeWilcoxonDf()
 WilcoxonPerImplementationDf = initializeWilcoxonDf()
+instanceName = ""
+implementation1Name = ""
+implementation2Name = ""
+optimalValue = 0
 
+# Output variables
 minSolCost = None
 avgSolCost = None
 stdSolCost = None
 avgRuntime = None
 p_value = None
 
-instanceName = ""
-implementation1Name = ""
-implementation2Name = ""
-optimalValue = 0
+
+
+
 # for adding new rows to the WilcoxonDf
 row = {}
 #endregion
-
-#region TESTING 
-# df1 = data.loc[data["Implementation"] == '2-opt, shift-1, double-bridge']
-# df1_data = df1["Best Solution Cost"].tolist()
-
-# print(df1.head())
-# print(implementationRange)
-#endregion
-
 
 
 # Iterate through every possible pair of implementations
