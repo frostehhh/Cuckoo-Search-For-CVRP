@@ -5,7 +5,7 @@ import experiment as exp
 from CVRP import CVRPInfo as CVRP
 from CuckooSearchCVRP import CuckooSearch
 
-experimentData = []
+dataPerInstance = []
 instanceData = []
 
 #region Load Datasets
@@ -31,9 +31,9 @@ fileName = 'FinalResults'
 implementationName = '2-opt, reinsertion, swap-2-2'
 
 
-experimentData = exp.initializeExperimentData()
+dataPerInstance = exp.initializeExperimentData()
 instanceData = exp.initializeInstanceData()
-completeInstanceData = exp.initializeInstanceData()
+dataPerRun = exp.initializeInstanceData()
 for dataset in DataSet:
         instanceData = exp.initializeInstanceData()
         for i in range(numIter):
@@ -41,11 +41,11 @@ for dataset in DataSet:
                 solver = CuckooSearch(CVRPInstance = CVRPInstance, numCuckoos = numNests, Pa = Pa, Pc = Pc, generations = maxGenerations, stopCriterion = stopCriterion)
                 solver.solveInstance()
                 exp.appendRowToInstanceDf(instanceData, solver.readData())
-                exp.appendRowToInstanceDf(completeInstanceData, solver.readData())
-                completeInstanceData["Implementation"] = implementationName
+                exp.appendRowToInstanceDf(dataPerRun, solver.readData())
+                dataPerRun["Implementation"] = implementationName
         row = exp.calculateInstanceResults(instanceData)
-        exp.appendRowToExperimentDf(experimentData, row)
-        experimentData["Implementation"] = implementationName
-exp.saveResultsToCsv(completeInstanceData, finalResultsPath, fileName + 'PerRun', type='merge')
-exp.saveResultsToCsv(experimentData, finalResultsPath, fileName + 'PerImplementation', type='merge')
+        exp.appendRowToExperimentDf(dataPerInstance, row)
+        dataPerInstance["Implementation"] = implementationName
+exp.saveResultsToCsv(dataPerRun, finalResultsPath, fileName + 'PerRun')
+exp.saveResultsToCsv(dataPerInstance, finalResultsPath, fileName + 'PerInstance')
 
