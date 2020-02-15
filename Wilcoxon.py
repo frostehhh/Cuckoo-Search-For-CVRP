@@ -5,10 +5,20 @@ from experiment import initializeWilcoxonDf
 from experiment import saveResultsToCsv
 import numpy as np
 
+"""
+For computation of Wilcoxon results with all possible pairs of implementations
+
+Input: FinalResultsPerRun.csv
+Output:
+WilcoxonPerInstanceFinal.csv
+WilcoxonPerDatasetFinal.csv
+WilcoxonPerImplementationFinal.csv
+"""
+
 #region Variable Initialization
-sourcePath = 'newFinalResults/'
-sourceFileName = 'FinalResultsPerRun - Compiled Csv'
-resultsPath = 'newFinalResults/'
+sourcePath = 'FinalResults/'
+sourceFileName = 'FinalResultsPerRun - Compiled'
+resultsPath = 'FinalResults/'
 resultsPerInstanceFileName = 'WilcoxonPerInstanceFinal'
 resultsPerDatasetFilename = 'WilcoxonPerDatasetFinal'
 resultsPerImplementationFileName = 'WilcoxonPerImplementationFinal'
@@ -44,9 +54,6 @@ avgSolCost = None
 stdSolCost = None
 avgRuntime = None
 p_value = None
-
-
-
 
 # for adding new rows to the WilcoxonDf
 row = {}

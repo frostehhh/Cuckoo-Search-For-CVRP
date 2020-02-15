@@ -3,6 +3,10 @@ import os
 import numpy as np
 import math
 
+"""
+Storing of experiment data
+"""
+
 def initializeInstanceData():
         """
         Initializes instance data

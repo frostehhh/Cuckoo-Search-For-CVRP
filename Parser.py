@@ -1,6 +1,9 @@
 import regex as re
 from decimal import Decimal as decimal
 
+"""
+Read instance files from datasets used
+"""
 
 rx_dict = {
     'name': re.compile(r'NAME : (?P<name>.*)'),
