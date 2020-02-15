@@ -167,37 +167,15 @@ def calculateInstanceResults(instanceData):
 def saveResultsToCsv(df, path, fileNameSuffix, type='default'):
         df = pd.DataFrame(df)
         # write to results.csv
-        fileNum = 0
-        while True:
-                if fileNum < 10:
-                        _ = '0' + str(fileNum)
-                else:
-                        _ = str(fileNum)
-                if type == 'default': # per implementation
-                        df.to_csv(path + fileNameSuffix + '.csv')
-                        print('Saved ' + fileNameSuffix + '.csv')
-                        break
-                elif type == 'merge':
-                        # NOT DONE
-                        if os.path.exists(path + fileNameSuffix + '.csv'):
-                                data = pd.read_csv(path + fileNameSuffix + '.csv', header=[0], index_col=0)
-                                data = data.append(df, sort=False)
-                                data.reset_index(inplace=True, drop=True)
-                                # data.drop(data.columns[data.columns.size - 1], axis=1, inplace=True)
-                                # data.reset_index(inplace=True, drop=True)
-                                data.to_csv(path + fileNameSuffix + '.csv')
-                        else:
-                                df.to_csv(path + fileNameSuffix + '.csv')
-                        
-                        break
-                else: # extra
-                        if os.path.exists(path + 'results' +  _ + '_' + fileNameSuffix + '.csv'):
-                                fileNum += 1
-                                continue
-                        else:
-                                df.to_csv(path + 'results' +  _ + '_' + fileNameSuffix + '.csv')
-                                print('Saved ' + 'results' +  _ + '_' + fileNameSuffix + '.csv')
-                                break
+        if os.path.exists(path + fileNameSuffix + '.csv'):
+                data = pd.read_csv(path + fileNameSuffix + '.csv', header=[0], index_col=0)
+                data = data.append(df, sort=False)
+                data.reset_index(inplace=True, drop=True)
+                data.to_csv(path + fileNameSuffix + '.csv')
+        else:
+                df.to_csv(path + fileNameSuffix + '.csv')
+
+                
 # def saveResultsInfoTxt(string, path):
 #         fileNum = 0
 #         while True:
