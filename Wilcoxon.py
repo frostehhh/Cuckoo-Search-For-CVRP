@@ -212,9 +212,9 @@ for i in implementationRange[:-1]:
             'P-value': p_value
         }
         appendRowToWilcoxonDf(WilcoxonPerImplementationDf, row)
-# saveResultsToCsv(WilcoxonPerInstanceDf, resultsPath, resultsPerInstanceFileName)
+saveResultsToCsv(WilcoxonPerInstanceDf, resultsPath, resultsPerInstanceFileName)
 saveResultsToCsv(WilcoxonPerDatasetDf, resultsPath, resultsPerDatasetFilename)
-# saveResultsToCsv(WilcoxonPerImplementationDf, resultsPath, resultsPerImplementationFileName)
+saveResultsToCsv(WilcoxonPerImplementationDf, resultsPath, resultsPerImplementationFileName)
 
 
         
