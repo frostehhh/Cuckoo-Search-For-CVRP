@@ -1,4 +1,4 @@
-import regex as re
+import re
 from decimal import Decimal as decimal
 
 """
