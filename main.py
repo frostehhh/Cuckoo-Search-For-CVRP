@@ -20,7 +20,7 @@ finalResultsPath = 'FinalResults/'
 numNests = 15
 Pa = 0.25 # Fraction of worse solutions to be replaced
 Pc = 0.6 # Fraction of cuckoos performing Levy Flights
-maxGenerations = 1000s# maximum number of iterations
+maxGenerations = 1000# maximum number of iterations
 stopCriterion = maxGenerations/5 # attempt limit of successive iterations
 
 print('Parameters: numNests = ' + str(numNests) + ' Pa = ' + str(Pa) + ' Pc = ' + str(Pc) +
