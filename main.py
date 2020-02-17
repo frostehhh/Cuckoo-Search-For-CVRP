@@ -13,7 +13,6 @@ DataSetPath = 'data/FinalDataset/'
 DataSet = os.listdir(DataSetPath) # list of file names of of instances from 
 #end region
 
-# FinalResultsPath = 'finalresults/'
 finalResultsPath = 'FinalResults/'
 
 #Initialize Cuckoo SearchParameters
